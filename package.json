@@ -1,0 +1,30 @@
+{
+  "name": "delivery-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "On-demand delivery platform",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:unit": "turbo test:unit",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "turbo test:e2e",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
+    "clean": "turbo clean",
+    "db:migrate": "pnpm --filter @repo/database migrate",
+    "db:seed": "pnpm --filter @repo/database seed",
+    "db:reset": "pnpm --filter @repo/database reset"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "prettier": "^3.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=18"
+  }
+}

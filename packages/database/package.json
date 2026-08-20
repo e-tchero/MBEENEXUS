@@ -1,0 +1,12 @@
+{
+  "name": "@repo/database",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "migrate": "echo 'Run migrations via Supabase CLI'",
+    "seed": "echo 'Run seed via Supabase CLI'",
+    "reset": "echo 'Run reset via Supabase CLI'",
+    "typecheck": "echo 'Database package - no TypeScript'",
+    "clean": "echo 'Database package - no build artifacts'"
+  }
+}
