@@ -2,8 +2,8 @@
 // Application Constants
 // =============================================
 
-export const APP_NAME = 'Delivery Platform';
-export const APP_DESCRIPTION = 'On-demand delivery platform';
+export const APP_NAME = 'MBEENEXUS';
+export const APP_DESCRIPTION = 'On-demand delivery platform — Abuja';
 
 // =============================================
 // Order Constants
@@ -161,11 +161,8 @@ export const URGENCY_LEVELS = {
   URGENT: 'urgent',
 } as const;
 
-export const URGENCY_MULTIPLIERS: Record<string, number> = {
-  standard: 1.0,
-  express: 1.5,
-  urgent: 2.0,
-};
+// Priority delivery is a fixed add-on from platform_settings, not a multiplier
+// See: priority_delivery_fee in platform_settings
 
 // =============================================
 // Weight Bands (Default)

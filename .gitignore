@@ -54,3 +54,8 @@ pnpm-debug.log*
 
 # Misc
 *.log
+
+# Temporary files
+login_resp.json
+MBEENEXUS-MEMORY-BACKUP.md
+e2e-test.js

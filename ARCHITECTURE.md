@@ -1988,7 +1988,7 @@ $$ LANGUAGE sql;
 | `NOTIFICATION_PUSH` | Various events | Send push notification |
 | `REFUND_PROCESS` | Refund requested | Process refund via Paystack |
 | `LOCATION_CLEANUP` | Scheduled (daily) | Delete old rider locations |
-| `RIDER_LOCATION_REFRESH` | Scheduled (30s) | Refresh materialized view |
+| `RIDER_LOCATION_REFRESH` | Scheduled (configurable) | Rider current location UPSERT (no materialized view) |
 | `EARNINGS_AGGREGATION` | Scheduled (hourly) | Verify cached earnings |
 
 ## 11.2 Job Processing
@@ -2134,11 +2134,76 @@ export async function updateRiderLocation(riderId: string, location: LocationDat
 - **NOT exposed:** heading, speed, accuracy
 - **Phone masking:** `080****1234`
 
-## 12.4 Retention & Cleanup
+## 12.4 Location Data Architecture (Two-Tier)
 
-- **Historical locations:** Retained for 30 days
-- **Current location:** Updated in real-time
-- **Cleanup job:** Runs daily, deletes records older than 30 days
+### Current Rider Location (`rider_current_locations`)
+
+- **Purpose:** Optimized for dispatch and live customer tracking
+- **Update frequency:** Configurable per delivery state (moving: 5-10s, idle: 30s, stopped: 60s)
+- **Table:** Regular table with `rider_id` as PRIMARY KEY
+- **Index:** GIST spatial index on `location` for dispatch queries
+- **Contains:** rider_id, latitude, longitude, location (GEOGRAPHY), heading, speed, accuracy, is_available, updated_at
+- **Behavior:** UPSERT — one row per rider, always current
+- **Read pattern:** Dispatch queries + active delivery tracking subscriptions
+- **Write pattern:** High-frequency updates from rider device
+- **Optimization:** Spatial index + partial index on is_available
+
+### Historical Rider Location (`rider_locations`)
+
+- **Purpose:** Audit trail, delivery history, dispute resolution, analytics
+- **Write pattern:** Append-only INSERT from rider location updates
+- **Contains:** rider_id, latitude, longitude, location (GEOGRAPHY), heading, speed, accuracy, recorded_at
+- **Index:** rider_id + recorded_at DESC for efficient time-range queries
+- **Retention:** Configurable (default: 90 days)
+- **Cleanup:** Scheduled background job (`LOCATION_CLEANUP`) deletes records older than retention period
+- **Scaling path:** At high volume, partition by month or rider_id range
+
+### Active Delivery Tracking (Supabase Realtime)
+
+- **Channel:** `order:{order_id}` per active delivery
+- **Authorization:** Server-side check — customer must own the order
+- **Update flow:**
+  1. Rider sends location update to backend
+  2. Backend writes to `rider_current_locations` (UPSERT)
+  3. Backend writes sampled record to `rider_locations` (every Nth update, configurable)
+  4. Backend broadcasts to `order:{order_id}` channel
+  5. Customer map receives broadcast and updates marker
+- **Throttling:** Backend enforces minimum interval between broadcasts (configurable, default 5s)
+- **Stale detection:** If no update received within `stale_threshold_seconds` (configurable, default 30s), customer UI shows "Last seen X ago"
+
+### Migration Path Toward Scale
+
+**MVP (current):** Supabase Realtime + PostgreSQL
+- Location writes go to both `rider_current_locations` (UPSERT) and `rider_locations` (INSERT)
+- Customer tracking via Supabase Realtime channels
+- Suitable for hundreds of concurrent riders
+
+**Future (1000+ concurrent riders):** Redis + Supabase Realtime
+- Current location moves to Redis (lat/lon + TTL)
+- Historical location still written to PostgreSQL periodically
+- Supabase Realtime still broadcasts to customers
+- Dispatch reads from Redis instead of PostgreSQL
+
+**Scale (10K+ concurrent riders):** Dedicated location service
+- Location service handles GPS ingestion
+- Redis cluster for current locations
+- PostgreSQL for historical samples
+- Separate realtime infrastructure (e.g., Ably, Pusher, or custom WebSocket)
+- Dispatch service reads from Redis/geo index
+
+## 12.5 Location Retention Policy
+
+| Data | Retention | Cleanup | Purpose |
+|------|-----------|---------|---------|
+| `rider_current_locations` | Never deleted (UPSERT) | N/A | Always current |
+| `rider_locations` | 90 days (configurable) | Daily `LOCATION_CLEANUP` job | History/audit |
+| Active delivery broadcast | Session only | Channel cleanup on delivery complete | Real-time only |
+
+The active customer's tracking experience depends ONLY on:
+1. `rider_current_locations` (for current position)
+2. Realtime broadcast channel (for live updates)
+
+Neither depends on the growing `rider_locations` history table.
 
 ---
 
@@ -2147,29 +2212,34 @@ export async function updateRiderLocation(riderId: string, location: LocationDat
 ## 13.1 Current Location Index
 
 ```sql
--- Materialized view for dispatch (refreshed every 30 seconds)
-CREATE MATERIALIZED VIEW rider_current_locations AS
-SELECT DISTINCT ON (rider_id)
-  rider_id,
-  latitude,
-  longitude,
-  location,
-  heading,
-  speed,
-  accuracy,
-  recorded_at
-FROM rider_locations
-WHERE recorded_at > NOW() - INTERVAL '5 minutes'
-ORDER BY rider_id, recorded_at DESC;
+-- Regular table (NOT materialized view) for dispatch
+-- Updated via UPSERT on every rider location update
+CREATE TABLE rider_current_locations (
+  rider_id UUID PRIMARY KEY REFERENCES rider_profiles(id),
+  latitude DECIMAL(10,8) NOT NULL,
+  longitude DECIMAL(11,8) NOT NULL,
+  location GEOGRAPHY(POINT, 4326) NOT NULL,
+  heading DECIMAL(5,2),
+  speed DECIMAL(5,2),
+  accuracy DECIMAL(8,2),
+  is_available BOOLEAN DEFAULT FALSE,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-CREATE UNIQUE INDEX idx_rider_current_locations_rider ON rider_current_locations(rider_id);
-CREATE INDEX idx_rider_current_locations_geo ON rider_current_locations USING GIST(location);
+-- Spatial index for nearest-rider dispatch queries
+CREATE INDEX idx_rider_current_locations_geo
+  ON rider_current_locations USING GIST(location);
+
+-- Partial index for available riders only (most dispatch queries)
+CREATE INDEX idx_rider_current_locations_available
+  ON rider_current_locations(is_available)
+  WHERE is_available = TRUE;
 ```
 
 ## 13.2 Dispatch Query
 
 ```sql
--- Optimized nearest-rider query using materialized view
+-- Nearest-eligible-rider query using spatial index
 SELECT * FROM find_nearest_riders(
   $1,  -- pickup latitude
   $2,  -- pickup longitude
@@ -2320,7 +2390,7 @@ SELECT * FROM find_nearest_riders(
 | 17 | Made tax rate/name configurable and versioned in pricing_rules | REQ 12 | §4.1, §7 |
 | 18 | Created `background_jobs` table and job processing functions | REQ 13 | §4.1, §11 |
 | 19 | Redesigned realtime with authorized subscription model | REQ 14 | §12 |
-| 20 | Added `rider_current_locations` materialized view | REQ 15 | §4.1, §13 |
+| 20 | Added `rider_current_locations` regular table with GIST spatial index | REQ 15 | §4.1, §13 |
 
 ---
 
@@ -2834,6 +2904,41 @@ export async function middleware(request: NextRequest) {
 7. **Rider Compensation for Cancellations** — affects rider retention
 8. **Platform Fee Structure** — affects revenue model
 9. **Dispute Resolution Process** — affects customer support workflow
+
+---
+
+# 22. MULTI-CLIENT ARCHITECTURE CONSTRAINT
+
+MBEENEXUS is a multi-client platform. The web application (`apps/web`) is the first client. Future clients will include native mobile applications for iOS and Android (`apps/mobile`, likely React Native/Expo + TypeScript).
+
+## Constraint
+
+All business logic, pricing, authorization, order processing, payments, dispatch, tracking, and other core functionality must remain **client-agnostic** and accessible through properly designed server-side APIs and services.
+
+The future mobile applications **must** consume the same MBEENEXUS backend rather than having a separate backend or duplicated business logic.
+
+## Architecture Rules
+
+1. **No business logic in client components.** All domain logic lives in server-side services (`lib/services/`), API routes (`app/api/`), or PostgreSQL functions.
+2. **API routes are the client boundary.** Every operation requiring authentication, authorization, or server-side validation goes through API routes.
+3. **Shared packages are client-agnostic.** `packages/shared` must contain TypeScript types, validators, constants, and business-domain definitions usable by any client (web, mobile, CLI).
+4. **No browser-only dependencies in business logic.** Services and API routes must not depend on browser-specific APIs (window, document, localStorage, etc.).
+5. **No Next.js-specific dependencies in shared packages.** `packages/shared` must not import from `next/`, `react/`, or any framework-specific module.
+6. **Authentication is provider-based, not framework-based.** Auth logic must be expressible through Supabase Auth SDK independently of Next.js.
+7. **WebSocket/Realtime connections must use standard protocols.** Supabase Realtime is protocol-compatible with any client.
+
+## Planned Client Structure
+
+```
+apps/web      — Next.js web application (current)
+apps/mobile   — React Native/Expo mobile application (future)
+packages/shared — Types, validators, constants, domain definitions (shared)
+packages/database — Migrations, seed data, schema documentation (shared)
+```
+
+## Verification
+
+Before completing any milestone, verify that no business logic is embedded in client components that would prevent reuse from a non-Next.js client.
 
 ---
 
