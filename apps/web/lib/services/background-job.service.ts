@@ -14,54 +14,113 @@ export function registerJobHandler(jobType: JobType, handler: JobHandler): void 
   handlers[jobType] = handler;
 }
 
+interface ClaimedJob {
+  id: string;
+  job_type: string;
+  payload: Record<string, unknown>;
+  priority: number;
+  attempts: number;
+  max_attempts: number;
+}
+
+/**
+ * Atomically claim the next pending job using FOR UPDATE SKIP LOCKED.
+ * This prevents concurrent workers from processing the same job.
+ */
+async function claimNextJob(): Promise<ClaimedJob | null> {
+  const serviceRole = await createServiceRoleClient();
+
+  // Use the PostgreSQL function that wraps FOR UPDATE SKIP LOCKED
+  const { data, error } = await serviceRole.rpc('claim_next_pending_job');
+
+  if (error || !data || data.length === 0) {
+    return null;
+  }
+
+  const row = data[0] as Record<string, unknown>;
+  return {
+    id: row.id as string,
+    job_type: row.job_type as string,
+    payload: (row.payload as Record<string, unknown>) || {},
+    priority: (row.priority as number) || 0,
+    attempts: (row.attempts as number) || 0,
+    max_attempts: (row.max_attempts as number) || 3,
+  };
+}
+
+/**
+ * Mark a job as completed.
+ */
+async function completeJob(jobId: string): Promise<void> {
+  const serviceRole = await createServiceRoleClient();
+  await serviceRole
+    .from('background_jobs')
+    .update({
+      status: 'completed' satisfies JobStatus,
+      completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', jobId);
+}
+
+/**
+ * Mark a job as failed or retrying.
+ */
+async function failJob(
+  jobId: string,
+  errorMessage: string,
+  attempts: number,
+  maxAttempts: number
+): Promise<void> {
+  const serviceRole = await createServiceRoleClient();
+  const shouldRetry = attempts < maxAttempts;
+
+  await serviceRole
+    .from('background_jobs')
+    .update({
+      status: shouldRetry ? ('retrying' satisfies JobStatus) : ('failed' satisfies JobStatus),
+      error_message: errorMessage,
+      failed_at: shouldRetry ? null : new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      scheduled_at: shouldRetry
+        ? new Date(Date.now() + 5000 * Math.pow(2, attempts - 1)).toISOString()
+        : undefined,
+    })
+    .eq('id', jobId);
+}
+
 /**
  * Process pending background jobs.
  * Called by the cron endpoint on a schedule.
  *
- * Uses FOR UPDATE SKIP LOCKED for concurrency safety.
- * Multiple cron invocations will not process the same job.
+ * Uses FOR UPDATE SKIP LOCKED via claim_next_pending_job() PostgreSQL function.
+ * Multiple concurrent workers will never process the same job.
  */
 export async function processPendingJobs(): Promise<{
   processed: number;
   failed: number;
   errors: string[];
 }> {
-  const serviceRole = await createServiceRoleClient();
-
-  // Fetch pending jobs with row-level locking
-  const { data: jobs, error: fetchError } = await serviceRole
-    .from('background_jobs')
-    .select('*')
-    .eq('status', 'pending')
-    .lte('scheduled_at', new Date().toISOString())
-    .order('priority', { ascending: false })
-    .order('created_at', { ascending: true })
-    .limit(10);
-
-  if (fetchError) {
-    console.error('Failed to fetch background jobs:', fetchError);
-    return { processed: 0, failed: 0, errors: [fetchError.message] };
-  }
-
-  if (!jobs || jobs.length === 0) {
-    return { processed: 0, failed: 0, errors: [] };
-  }
-
   let processed = 0;
   let failed = 0;
   const errors: string[] = [];
 
-  for (const job of jobs) {
+  // Process jobs in batches (max 5 per cron invocation)
+  for (let batch = 0; batch < 5; batch++) {
+    // Atomically claim one pending job using FOR UPDATE SKIP LOCKED
+    const job = await claimNextJob();
+
+    if (!job) {
+      // No more pending jobs
+      break;
+    }
+
     try {
-      // Mark as processing
+      // Increment attempts count
+      const serviceRole = await createServiceRoleClient();
       await serviceRole
         .from('background_jobs')
-        .update({
-          status: 'processing' satisfies JobStatus,
-          started_at: new Date().toISOString(),
-          attempts: job.attempts + 1,
-          updated_at: new Date().toISOString(),
-        })
+        .update({ attempts: job.attempts + 1 })
         .eq('id', job.id);
 
       // Execute handler
@@ -73,34 +132,13 @@ export async function processPendingJobs(): Promise<{
       }
 
       // Mark as completed
-      await serviceRole
-        .from('background_jobs')
-        .update({
-          status: 'completed' satisfies JobStatus,
-          completed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', job.id);
-
+      await completeJob(job.id);
       processed++;
     } catch (error) {
       console.error(`Job ${job.id} (${job.job_type}) failed:`, error);
 
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      const shouldRetry = job.attempts + 1 < job.max_attempts;
-
-      await serviceRole
-        .from('background_jobs')
-        .update({
-          status: shouldRetry ? ('retrying' satisfies JobStatus) : ('failed' satisfies JobStatus),
-          error_message: errorMessage,
-          failed_at: shouldRetry ? null : new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          scheduled_at: shouldRetry
-            ? new Date(Date.now() + 5000 * (job.attempts + 1)).toISOString() // Exponential backoff
-            : job.scheduled_at,
-        })
-        .eq('id', job.id);
+      await failJob(job.id, errorMessage, job.attempts + 1, job.max_attempts);
 
       failed++;
       errors.push(`Job ${job.id}: ${errorMessage}`);
@@ -108,60 +146,6 @@ export async function processPendingJobs(): Promise<{
   }
 
   return { processed, failed, errors };
-}
-
-/**
- * Process expired rider offers.
- * Should be called periodically (e.g., every 30 seconds).
- */
-export async function processExpiredOffers(): Promise<number> {
-  const serviceRole = await createServiceRoleClient();
-
-  // Find expired offers
-  const { data: expired, error } = await serviceRole
-    .from('rider_assignments')
-    .select('id, order_id, rider_id')
-    .eq('status', 'offered')
-    .lt('expires_at', new Date().toISOString())
-    .limit(50);
-
-  if (error || !expired || expired.length === 0) {
-    return 0;
-  }
-
-  let processed = 0;
-
-  for (const assignment of expired) {
-    try {
-      // Mark as expired
-      await serviceRole
-        .from('rider_assignments')
-        .update({
-          status: 'expired',
-          responded_at: new Date().toISOString(),
-        })
-        .eq('id', assignment.id);
-
-      // Re-make rider available
-      await serviceRole
-        .from('rider_current_locations')
-        .update({ is_available: true })
-        .eq('rider_id', assignment.rider_id);
-
-      // Create DISPATCH_RETRY job
-      await serviceRole.from('background_jobs').insert({
-        job_type: 'DISPATCH_RETRY',
-        payload: { order_id: assignment.order_id },
-        priority: 8,
-      });
-
-      processed++;
-    } catch (error) {
-      console.error(`Failed to expire assignment ${assignment.id}:`, error);
-    }
-  }
-
-  return processed;
 }
 
 /**
