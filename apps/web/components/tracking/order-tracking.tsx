@@ -6,6 +6,10 @@ import { TrackingMap } from './tracking-map';
 import { RiderCard } from './rider-card';
 import { OrderTimeline } from './order-timeline';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { CancelOrderButton } from '@/components/order/cancel-order-button';
+import { RefundStatus } from '@/components/order/refund-status';
+import { ProofDisplay } from '@/components/order/proof-display';
+import { RatingForm } from '@/components/order/rating-form';
 
 interface OrderData {
   id: string;
@@ -58,6 +62,10 @@ const TRACKING_STATUSES = new Set([
 ]);
 
 const TERMINAL_STATUSES = new Set(['delivered', 'completed', 'cancelled', 'failed']);
+const CANCELLABLE_STATUSES = new Set([
+  'paid', 'searching_rider', 'rider_assigned',
+  'rider_en_route_to_pickup', 'arrived_at_pickup'
+]);
 
 export function OrderTracking({ order: initialOrder, events: initialEvents }: OrderTrackingProps) {
   const [order, setOrder] = useState(initialOrder);
@@ -69,6 +77,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
     speed: number | null;
   } | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'reconnecting'>('connecting');
+  const [refundInitiated, setRefundInitiated] = useState(false);
 
   const isTracking = TRACKING_STATUSES.has(order.status);
   const isTerminal = TERMINAL_STATUSES.has(order.status);
@@ -142,6 +151,16 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
     : order.status === 'rider_en_route_to_pickup'
     ? Math.max(1, Math.round(order.estimated_duration_minutes * 0.3))
     : null;
+
+  const handleCancelled = useCallback((initiated: boolean) => {
+    setRefundInitiated(initiated);
+    setOrder(prev => ({ ...prev, status: 'cancelled' }));
+  }, []);
+
+  const showCancelButton = CANCELLABLE_STATUSES.has(order.status);
+  const showRefundStatus = order.status === 'cancelled' || order.status === 'failed';
+  const showProof = order.status === 'delivered' || order.status === 'completed';
+  const showRating = order.status === 'delivered' || order.status === 'completed';
 
   return (
     <div className="space-y-4">
@@ -225,6 +244,40 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <p className="text-sm font-medium text-green-800">Order completed</p>
         </div>
+      )}
+
+      {/* Phase 5C: Cancel button */}
+      {showCancelButton && (
+        <div className="bg-white shadow rounded-lg p-4">
+          <CancelOrderButton
+            orderId={order.id}
+            onCancelled={handleCancelled}
+          />
+        </div>
+      )}
+
+      {/* Phase 5C: Refund status */}
+      {showRefundStatus && (
+        <RefundStatus
+          orderId={order.id}
+          visible={showRefundStatus}
+        />
+      )}
+
+      {/* Phase 5C: Proof display */}
+      {showProof && (
+        <ProofDisplay
+          orderId={order.id}
+          visible={showProof}
+        />
+      )}
+
+      {/* Phase 5C: Rating form */}
+      {showRating && (
+        <RatingForm
+          orderId={order.id}
+          visible={showRating}
+        />
       )}
 
       {/* Delivery Details */}
