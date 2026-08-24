@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processPendingJobs, detectStaleRiders, registerJobHandler } from '@/lib/services/background-job.service';
 import { dispatchService } from '@/lib/services/dispatch.service';
+import { refundService } from '@/lib/services/refund.service';
 
 // Register dispatch job handlers
 registerJobHandler('DISPATCH_ORDER', async (payload) => {
@@ -22,6 +23,10 @@ registerJobHandler('OFFER_TIMEOUT', async (payload) => {
   if (orderId) {
     await dispatchService.processOfferTimeout(orderId);
   }
+});
+
+registerJobHandler('REFUND_PROCESS', async (payload) => {
+  await refundService.processRefundJob(payload);
 });
 
 /**

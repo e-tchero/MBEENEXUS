@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     if (payload.event === 'charge.success') {
       const reference = payload.data.reference;
       const amountInKobo = payload.data.amount;
+      const paystackTxnId = String(payload.data.id); // Paystack transaction ID
 
       // 4. Verify payment and confirm order
       const result = await serviceRole.rpc('verify_payment_and_confirm_order', {
@@ -49,14 +50,25 @@ export async function POST(request: NextRequest) {
       if (result.data && result.data.length > 0 && result.data[0].success) {
         const orderId = result.data[0].order_id;
 
-        // 5. Create dispatch background job
+        // 5. Store Paystack transaction ID on the payment record
+        // This is needed for refund processing later
+        await serviceRole
+          .from('payments')
+          .update({
+            paystack_transaction_id: paystackTxnId,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('order_id', orderId)
+          .eq('status', 'success');
+
+        // 6. Create dispatch background job
         await serviceRole.from('background_jobs').insert({
           job_type: 'DISPATCH_ORDER',
           payload: { order_id: orderId },
           priority: 10,
         });
 
-        // 6. Record idempotency
+        // 7. Record idempotency
         await serviceRole.from('processed_webhook_events').insert({
           provider: 'paystack',
           event_id: eventId,
