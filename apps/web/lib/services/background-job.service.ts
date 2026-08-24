@@ -78,13 +78,15 @@ async function failJob(
   await serviceRole
     .from('background_jobs')
     .update({
-      status: shouldRetry ? ('retrying' satisfies JobStatus) : ('failed' satisfies JobStatus),
+      // When retrying, use 'pending' (not 'retrying') so claim_next_pending_job() can pick it up.
+      // The scheduled_at delay preserves exponential backoff — the job won't be claimed until due.
+      status: shouldRetry ? ('pending' satisfies JobStatus) : ('failed' satisfies JobStatus),
       error_message: errorMessage,
       failed_at: shouldRetry ? null : new Date().toISOString(),
       updated_at: new Date().toISOString(),
       scheduled_at: shouldRetry
         ? new Date(Date.now() + 5000 * Math.pow(2, attempts - 1)).toISOString()
-        : undefined,
+        : null,
     })
     .eq('id', jobId);
 }
@@ -173,6 +175,27 @@ export async function detectStaleRiders(): Promise<number> {
 
   if (error) {
     console.error('Failed to detect stale riders:', error);
+    return 0;
+  }
+
+  return data ?? 0;
+}
+
+/**
+ * Recover jobs stuck in 'processing' state after a worker crash.
+ * Jobs are either returned to 'pending' for retry or marked 'failed'
+ * if retry limits have been exhausted.
+ */
+export async function recoverStuckJobs(
+  staleThresholdSeconds: number = 300
+): Promise<number> {
+  const serviceRole = await createServiceRoleClient();
+  const { data, error } = await serviceRole.rpc('recover_stuck_jobs', {
+    p_stale_threshold_seconds: staleThresholdSeconds,
+  });
+
+  if (error) {
+    console.error('Failed to recover stuck jobs:', error);
     return 0;
   }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processPendingJobs, detectStaleRiders, registerJobHandler } from '@/lib/services/background-job.service';
+import { processPendingJobs, detectStaleRiders, recoverStuckJobs, registerJobHandler } from '@/lib/services/background-job.service';
 import { dispatchService } from '@/lib/services/dispatch.service';
 import { refundService } from '@/lib/services/refund.service';
 
@@ -46,17 +46,23 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // Fail closed: if CRON_SECRET is not configured, deny all access.
+    // Do not allow unauthenticated cron invocations in production.
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Process pending background jobs (uses FOR UPDATE SKIP LOCKED)
+    // 1. Recover jobs stuck in 'processing' after worker crashes
+    const recoveredCount = await recoverStuckJobs();
+
+    // 2. Process pending background jobs (uses FOR UPDATE SKIP LOCKED)
     const jobResult = await processPendingJobs();
 
-    // Detect and mark stale riders
+    // 3. Detect and mark stale riders
     const staleRidersCount = await detectStaleRiders();
 
     return NextResponse.json({
+      recovered_stuck: recoveredCount,
       jobs: jobResult,
       stale_riders: staleRidersCount,
       timestamp: new Date().toISOString(),
