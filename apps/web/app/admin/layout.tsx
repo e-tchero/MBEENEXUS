@@ -1,10 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Manrope } from 'next/font/google';
 import { createClient } from '@/lib/supabase/server';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
-
-const manrope = Manrope({ subsets: ['latin'] });
 
 export default async function AdminLayout({
   children,
@@ -32,7 +29,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className={`min-h-screen bg-embee-white ${manrope.className}`}>
+    <div className="min-h-screen bg-embee-white">
       <AdminSidebar
         userName={profile.full_name || 'Admin'}
         userRole={profile.role}
