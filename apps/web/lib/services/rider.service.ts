@@ -283,7 +283,7 @@ export class RiderService {
       throw error;
     }
 
-    // Update rider verification status to under_review if currently pending
+    // Update rider verification status to under_review if currently pending or rejected
     await serviceRole
       .from('rider_profiles')
       .update({
@@ -291,7 +291,7 @@ export class RiderService {
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
-      .eq('verification_status', 'pending');
+      .in('verification_status', ['pending', 'rejected']);
 
     return data;
   }

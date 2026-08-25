@@ -4,6 +4,14 @@
 
 @layer base {
   :root {
+    /* EMBEE NEXUS Brand Tokens */
+    --embee-navy: #0B1220;
+    --embee-blue: #147BFF;
+    --embee-cyan: #38BDF8;
+    --embee-white: #F5F7FA;
+    --embee-charcoal: #111827;
+    --embee-slate: #64748B;
+
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;

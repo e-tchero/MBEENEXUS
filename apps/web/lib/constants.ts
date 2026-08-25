@@ -1,4 +1,4 @@
-export const APP_NAME = 'Delivery Platform';
+export const APP_NAME = 'Embee Nexus';
 export const APP_DESCRIPTION = 'On-demand delivery platform';
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
