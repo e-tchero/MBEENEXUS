@@ -51,13 +51,13 @@ export function CancelOrderButton({ orderId, onCancelled }: CancelOrderButtonPro
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Cancel Order?</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <h3 className="text-lg font-medium text-embee-charcoal mb-2">Cancel Order?</h3>
+            <p className="text-sm text-embee-slate mb-4">
               Are you sure you want to cancel this order? If payment was made, a refund will be initiated.
             </p>
 
             <div className="mb-4">
-              <label htmlFor="cancel-reason" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="cancel-reason" className="block text-sm font-medium text-embee-charcoal mb-1">
                 Reason (optional)
               </label>
               <textarea
@@ -66,7 +66,7 @@ export function CancelOrderButton({ orderId, onCancelled }: CancelOrderButtonPro
                 onChange={(e) => setReason(e.target.value)}
                 rows={2}
                 placeholder="Why are you cancelling?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-embee-blue"
               />
             </div>
 
@@ -85,7 +85,7 @@ export function CancelOrderButton({ orderId, onCancelled }: CancelOrderButtonPro
               <button
                 onClick={() => { setShowConfirm(false); setError(null); }}
                 disabled={loading}
-                className="flex-1 py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+                className="flex-1 py-2 px-4 border border-gray-200 text-sm font-medium rounded-md text-embee-charcoal bg-white hover:bg-embee-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
               >
                 Keep Order
               </button>

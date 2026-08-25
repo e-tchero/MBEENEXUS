@@ -106,7 +106,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-embee-slate">Loading...</div>
       </div>
     );
   }
@@ -114,13 +114,13 @@ export default function DashboardPage() {
   if (addresses.length === 0) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Welcome to MBEENEXUS</h2>
-        <p className="text-gray-600 mb-4">
+        <h2 className="text-xl font-semibold text-embee-charcoal mb-2">Welcome to Embee Nexus</h2>
+        <p className="text-embee-slate mb-4">
           To get started, please add at least one address.
         </p>
         <Link
           href="/addresses"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-embee-blue hover:bg-embee-blue/90"
         >
           Add Your First Address
         </Link>
@@ -147,8 +147,8 @@ export default function DashboardPage() {
             onConfirm={handleConfirmOrder}
           />
         ) : (
-          <div className="bg-gray-50 rounded-lg p-8 text-center">
-            <p className="text-gray-500">
+          <div className="bg-embee-white rounded-lg p-8 text-center">
+            <p className="text-embee-slate">
               Fill in the delivery details to get a quote.
             </p>
           </div>

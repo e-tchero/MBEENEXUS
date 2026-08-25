@@ -60,15 +60,15 @@ export function OrderTimeline({ events, currentStatus }: OrderTimelineProps) {
   if (!events || events.length === 0) {
     return (
       <div className="bg-white shadow rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Order Timeline</h3>
-        <p className="text-sm text-gray-500">No events recorded yet.</p>
+        <h3 className="text-sm font-semibold text-embee-charcoal mb-3">Order Timeline</h3>
+        <p className="text-sm text-embee-slate">No events recorded yet.</p>
       </div>
     );
   }
 
   return (
     <div className="bg-white shadow rounded-lg p-4">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">Order Timeline</h3>
+      <h3 className="text-sm font-semibold text-embee-charcoal mb-3">Order Timeline</h3>
       <div className="space-y-3">
         {events.map((event, idx) => {
           const completed = isEventCompleted(event, currentStatus);
@@ -80,19 +80,19 @@ export function OrderTimeline({ events, currentStatus }: OrderTimelineProps) {
                 <div
                   className={`w-2.5 h-2.5 rounded-full mt-1 ${
                     completed
-                      ? 'bg-indigo-500'
-                      : 'bg-gray-300'
+                      ? 'bg-embee-blue'
+                      : 'bg-gray-200'
                   }`}
                 />
                 {!isLast && (
-                  <div className={`w-0.5 flex-1 ${completed ? 'bg-indigo-200' : 'bg-gray-200'}`} />
+                  <div className={`w-0.5 flex-1 ${completed ? 'bg-embee-blue/20' : 'bg-gray-200'}`} />
                 )}
               </div>
               <div className="pb-3 min-w-0">
-                <p className={`text-sm font-medium ${completed ? 'text-gray-900' : 'text-gray-400'}`}>
+                <p className={`text-sm font-medium ${completed ? 'text-embee-charcoal' : 'text-embee-slate/60'}`}>
                   {getEventLabel(event)}
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-embee-slate/60">
                   {new Date(event.created_at).toLocaleString('en-NG', {
                     hour: '2-digit',
                     minute: '2-digit',

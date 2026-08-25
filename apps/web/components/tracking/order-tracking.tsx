@@ -167,10 +167,10 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
       {/* Status Header */}
       <div className="bg-white shadow rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-lg font-semibold text-gray-900">{order.order_number}</h1>
+          <h1 className="text-lg font-semibold text-embee-charcoal">{order.order_number}</h1>
           <StatusBadge status={order.status} />
         </div>
-        <p className="text-xs text-gray-500">Tracking: {order.tracking_code}</p>
+        <p className="text-xs text-embee-slate">Tracking: {order.tracking_code}</p>
 
         {connectionStatus === 'reconnecting' && (
           <div className="mt-2 px-3 py-1.5 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
@@ -208,15 +208,15 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
       {order.status === 'searching_rider' && (
         <div className="bg-white shadow rounded-lg p-6 text-center">
           <div className="animate-pulse">
-            <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24">
+            <div className="w-16 h-16 mx-auto mb-4 bg-embee-blue/10 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-embee-blue animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
             </div>
           </div>
-          <p className="text-sm font-medium text-gray-900">Finding a rider for you...</p>
-          <p className="text-xs text-gray-500 mt-1">This usually takes less than a minute</p>
+          <p className="text-sm font-medium text-embee-charcoal">Finding a rider for you...</p>
+          <p className="text-xs text-embee-slate mt-1">This usually takes less than a minute</p>
         </div>
       )}
 
@@ -282,23 +282,23 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
 
       {/* Delivery Details */}
       <div className="bg-white shadow rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Delivery Details</h3>
+        <h3 className="text-sm font-semibold text-embee-charcoal mb-3">Delivery Details</h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-500">From</span>
-            <span className="text-gray-900">{order.pickup_contact_name}</span>
+            <span className="text-embee-slate">From</span>
+            <span className="text-embee-charcoal">{order.pickup_contact_name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">To</span>
-            <span className="text-gray-900">{order.recipient_name}</span>
+            <span className="text-embee-slate">To</span>
+            <span className="text-embee-charcoal">{order.recipient_name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">Distance</span>
-            <span className="text-gray-900">{order.distance_km} km</span>
+            <span className="text-embee-slate">Distance</span>
+            <span className="text-embee-charcoal">{order.distance_km} km</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">Total</span>
-            <span className="font-medium text-gray-900">
+            <span className="text-embee-slate">Total</span>
+            <span className="font-medium text-embee-charcoal">
               {order.currency === 'NGN' ? '₦' : order.currency}
               {order.total_amount.toLocaleString()}
             </span>

@@ -89,7 +89,7 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
   if (existingRating) {
     return (
       <div className="bg-white shadow rounded-lg p-4 border-l-4 border-yellow-500">
-        <h3 className="text-sm font-medium text-gray-900 mb-2">Your Rating</h3>
+        <h3 className="text-sm font-medium text-embee-charcoal mb-2">Your Rating</h3>
         <div className="flex items-center space-x-1 mb-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -99,12 +99,12 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
               ★
             </span>
           ))}
-          <span className="text-sm text-gray-600 ml-2">({existingRating.rating}/5)</span>
+          <span className="text-sm text-embee-slate ml-2">({existingRating.rating}/5)</span>
         </div>
         {existingRating.comment && (
-          <p className="text-sm text-gray-600 mt-1">{existingRating.comment}</p>
+          <p className="text-sm text-embee-slate mt-1">{existingRating.comment}</p>
         )}
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-embee-slate mt-2">
           Submitted {new Date(existingRating.created_at).toLocaleDateString('en-NG')}
         </p>
       </div>
@@ -128,7 +128,7 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
 
   return (
     <div className="bg-white shadow rounded-lg p-4">
-      <h3 className="text-sm font-medium text-gray-900 mb-3">Rate Your Delivery</h3>
+      <h3 className="text-sm font-medium text-embee-charcoal mb-3">Rate Your Delivery</h3>
 
       {/* Star rating */}
       <div className="flex items-center space-x-1 mb-3">
@@ -144,14 +144,14 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
             <span className={
               star <= (hoveredRating || selectedRating)
                 ? 'text-yellow-400'
-                : 'text-gray-300'
+                : 'text-gray-200'
             }>
               ★
             </span>
           </button>
         ))}
         {selectedRating > 0 && (
-          <span className="text-sm text-gray-600 ml-2">
+          <span className="text-sm text-embee-slate ml-2">
             {selectedRating === 1 && 'Poor'}
             {selectedRating === 2 && 'Fair'}
             {selectedRating === 3 && 'Good'}
@@ -169,9 +169,9 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
           rows={2}
           maxLength={500}
           placeholder="Add a comment (optional)"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-embee-blue"
         />
-        <p className="text-xs text-gray-500 mt-1">{comment.length}/500</p>
+        <p className="text-xs text-embee-slate mt-1">{comment.length}/500</p>
       </div>
 
       {error && (
@@ -181,7 +181,7 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
       <button
         onClick={handleSubmit}
         disabled={submitting || selectedRating < 1}
-        className="w-full py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+        className="w-full py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-embee-blue hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
       >
         {submitting ? 'Submitting...' : 'Submit Rating'}
       </button>

@@ -49,8 +49,8 @@ export function AddressList({ addresses }: AddressListProps) {
   if (addresses.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">No addresses saved yet.</p>
-        <p className="text-sm text-gray-400 mt-2">
+        <p className="text-embee-slate">No addresses saved yet.</p>
+        <p className="text-sm text-embee-slate/60 mt-2">
           Add your first address to get started with deliveries.
         </p>
       </div>
@@ -66,21 +66,21 @@ export function AddressList({ addresses }: AddressListProps) {
         >
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="font-medium text-gray-900">
+              <h3 className="font-medium text-embee-charcoal">
                 {address.label || 'Address'}
               </h3>
               {address.is_default && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-embee-blue/10 text-embee-blue">
                   Default
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600 mt-1">{address.street_address}</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-embee-slate mt-1">{address.street_address}</p>
+            <p className="text-sm text-embee-slate">
               {address.city}, {address.state}, {address.country}
             </p>
             {address.postal_code && (
-              <p className="text-sm text-gray-500">Postal Code: {address.postal_code}</p>
+              <p className="text-sm text-embee-slate">Postal Code: {address.postal_code}</p>
             )}
           </div>
           <div className="flex gap-2">
@@ -88,7 +88,7 @@ export function AddressList({ addresses }: AddressListProps) {
               <button
                 onClick={() => handleSetDefault(address.id)}
                 disabled={loading === address.id}
-                className="text-sm text-primary-600 hover:text-primary-800"
+                className="text-sm text-embee-blue hover:text-embee-blue/80"
               >
                 Set as default
               </button>

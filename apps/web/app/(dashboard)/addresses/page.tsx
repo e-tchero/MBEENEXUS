@@ -20,7 +20,7 @@ export default async function AddressesPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Addresses</h1>
+        <h1 className="text-2xl font-bold text-embee-charcoal">My Addresses</h1>
         <CreateAddressButton />
       </div>
       <AddressList addresses={addresses || []} />

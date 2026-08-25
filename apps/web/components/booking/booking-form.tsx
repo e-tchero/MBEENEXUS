@@ -80,21 +80,21 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">Create Delivery</h2>
+      <h2 className="text-xl font-semibold text-embee-charcoal">Create Delivery</h2>
 
       {error && (
         <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">{error}</div>
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-embee-charcoal mb-2">
           Pickup Address *
         </label>
         <select
           required
           value={form.pickup_address_id}
           onChange={(e) => setForm({ ...form, pickup_address_id: e.target.value })}
-          className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+          className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
         >
           <option value="">Select pickup address</option>
           {addresses.map((addr) => (
@@ -107,14 +107,14 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-embee-charcoal mb-2">
           Destination Address *
         </label>
         <select
           required
           value={form.destination_address_id}
           onChange={(e) => setForm({ ...form, destination_address_id: e.target.value })}
-          className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+          className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
         >
           <option value="">Select destination address</option>
           {addresses.map((addr) => (
@@ -127,14 +127,14 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-embee-charcoal mb-2">
           Package Category *
         </label>
         <select
           required
           value={form.category_id}
           onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-          className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+          className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
         >
           <option value="">Select category</option>
           {categories.map((cat) => (
@@ -147,7 +147,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-embee-charcoal mb-2">
             Weight (kg)
           </label>
           <input
@@ -158,11 +158,11 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
             value={form.weight_kg}
             onChange={(e) => setForm({ ...form, weight_kg: e.target.value })}
             placeholder="Optional"
-            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-embee-charcoal mb-2">
             Quantity
           </label>
           <input
@@ -171,13 +171,13 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
             max="100"
             value={form.quantity}
             onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-embee-charcoal mb-2">
           Urgency
         </label>
         <div className="grid grid-cols-3 gap-3">
@@ -188,8 +188,8 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
               onClick={() => setForm({ ...form, urgency_level: level })}
               className={`py-2 px-4 border rounded-md text-sm font-medium ${
                 form.urgency_level === level
-                  ? 'bg-primary-50 border-primary-500 text-primary-700'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-embee-blue/10 border-embee-blue text-embee-blue'
+                  : 'bg-white border-gray-200 text-embee-charcoal hover:bg-embee-white'
               }`}
             >
               {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -201,7 +201,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-primary-600 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+        className="w-full bg-embee-blue py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
       >
         {loading ? 'Calculating...' : 'Get Quote'}
       </button>

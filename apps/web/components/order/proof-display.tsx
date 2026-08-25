@@ -52,26 +52,26 @@ export function ProofDisplay({ orderId, visible }: ProofDisplayProps) {
 
   return (
     <div className="bg-white shadow rounded-lg p-4 border-l-4 border-green-500">
-      <h3 className="text-sm font-medium text-gray-900 mb-2">Delivery Proof</h3>
+      <h3 className="text-sm font-medium text-embee-charcoal mb-2">Delivery Proof</h3>
 
       <div className="space-y-2">
         {proof.recipient_name && (
           <div className="flex items-center text-sm">
-            <span className="text-gray-500 w-24">Received by</span>
-            <span className="text-gray-900 font-medium">{proof.recipient_name}</span>
+            <span className="text-embee-slate w-24">Received by</span>
+            <span className="text-embee-charcoal font-medium">{proof.recipient_name}</span>
           </div>
         )}
 
         {proof.notes && (
           <div className="flex items-start text-sm">
-            <span className="text-gray-500 w-24">Notes</span>
-            <span className="text-gray-700">{proof.notes}</span>
+            <span className="text-embee-slate w-24">Notes</span>
+            <span className="text-embee-charcoal">{proof.notes}</span>
           </div>
         )}
 
         <div className="flex items-center text-sm">
-          <span className="text-gray-500 w-24">Delivered at</span>
-          <span className="text-gray-700">
+          <span className="text-embee-slate w-24">Delivered at</span>
+          <span className="text-embee-charcoal">
             {proof.recorded_at
               ? new Date(proof.recorded_at).toLocaleString('en-NG')
               : new Date(proof.created_at).toLocaleString('en-NG')}
@@ -79,8 +79,8 @@ export function ProofDisplay({ orderId, visible }: ProofDisplayProps) {
         </div>
 
         <div className="flex items-center text-sm">
-          <span className="text-gray-500 w-24">Proof type</span>
-          <span className="text-gray-700 capitalize">{proof.proof_type.replace(/_/g, ' ')}</span>
+          <span className="text-embee-slate w-24">Proof type</span>
+          <span className="text-embee-charcoal capitalize">{proof.proof_type.replace(/_/g, ' ')}</span>
         </div>
       </div>
     </div>

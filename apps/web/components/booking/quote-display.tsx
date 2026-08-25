@@ -47,7 +47,7 @@ export function QuoteDisplay({
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Delivery Quote</h2>
+      <h2 className="text-xl font-semibold text-embee-charcoal mb-4">Delivery Quote</h2>
 
       <div className="space-y-4 mb-6">
         <div className="flex items-start gap-3">
@@ -55,8 +55,8 @@ export function QuoteDisplay({
             <span className="text-green-600 text-sm">A</span>
           </div>
           <div>
-            <p className="text-sm text-gray-500">Pickup</p>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm text-embee-slate">Pickup</p>
+            <p className="text-sm font-medium text-embee-charcoal">
               {pickupAddress?.label ? `${pickupAddress.label}: ` : ''}
               {pickupAddress?.street_address}, {pickupAddress?.city}
             </p>
@@ -68,46 +68,46 @@ export function QuoteDisplay({
             <span className="text-red-600 text-sm">B</span>
           </div>
           <div>
-            <p className="text-sm text-gray-500">Destination</p>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm text-embee-slate">Destination</p>
+            <p className="text-sm font-medium text-embee-charcoal">
               {destinationAddress?.label ? `${destinationAddress.label}: ` : ''}
               {destinationAddress?.street_address}, {destinationAddress?.city}
             </p>
           </div>
         </div>
 
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-embee-slate">
           <p>{quote.distance_km.toFixed(1)} km • {quote.estimated_duration_minutes} min estimated</p>
         </div>
       </div>
 
       <div className="border-t pt-4 space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Base fare</span>
+          <span className="text-embee-slate">Base fare</span>
           <span>₦{quote.base_fee.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Distance ({quote.distance_km.toFixed(1)} km)</span>
+          <span className="text-embee-slate">Distance ({quote.distance_km.toFixed(1)} km)</span>
           <span>₦{quote.distance_fee.toLocaleString()}</span>
         </div>
         {quote.weight_fee > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Weight surcharge</span>
+            <span className="text-embee-slate">Weight surcharge</span>
             <span>₦{quote.weight_fee.toLocaleString()}</span>
           </div>
         )}
         {quote.urgency_fee > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Priority delivery</span>
+            <span className="text-embee-slate">Priority delivery</span>
             <span>₦{quote.urgency_fee.toLocaleString()}</span>
           </div>
         )}
         <div className="flex justify-between text-sm border-t pt-2">
-          <span className="text-gray-600">Delivery fare</span>
+          <span className="text-embee-slate">Delivery fare</span>
           <span className="font-medium">₦{deliveryFare.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">VAT (7.5%)</span>
+          <span className="text-embee-slate">VAT (7.5%)</span>
           <span>₦{quote.tax_amount.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-lg font-semibold border-t pt-2">
@@ -117,7 +117,7 @@ export function QuoteDisplay({
       </div>
 
       <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-embee-charcoal mb-2">
           Payment Method
         </label>
         <div className="grid grid-cols-3 gap-3">
@@ -128,8 +128,8 @@ export function QuoteDisplay({
               onClick={() => setPaymentMethod(method)}
               className={`py-2 px-4 border rounded-md text-sm font-medium ${
                 paymentMethod === method
-                  ? 'bg-primary-50 border-primary-500 text-primary-700'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-embee-blue/10 border-embee-blue text-embee-blue'
+                  : 'bg-white border-gray-200 text-embee-charcoal hover:bg-embee-white'
               }`}
             >
               {method === 'card' ? 'Card' : method === 'bank_transfer' ? 'Bank Transfer' : 'USSD'}
@@ -141,12 +141,12 @@ export function QuoteDisplay({
       <button
         onClick={handleConfirm}
         disabled={loading}
-        className="mt-6 w-full bg-primary-600 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+        className="mt-6 w-full bg-embee-blue py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
       >
         {loading ? 'Processing...' : 'Confirm & Pay'}
       </button>
 
-      <p className="mt-2 text-xs text-center text-gray-500">
+      <p className="mt-2 text-xs text-center text-embee-slate">
         Quote valid for 5 minutes
       </p>
     </div>
