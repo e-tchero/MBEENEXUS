@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { RiderDashboard } from '@/components/rider/rider-dashboard';
 
@@ -32,12 +33,12 @@ export default async function RiderDashboardPage() {
           <p className="text-sm text-yellow-700">
             Your account is currently under review. You will be able to access the dashboard once your verification is approved.
           </p>
-          <a
+          <Link
             href="/rider/onboarding"
-            className="mt-4 inline-block text-sm text-yellow-800 underline hover:text-yellow-900"
+            className="mt-4 inline-block text-sm text-embee-blue hover:text-embee-blue/80"
           >
             View verification status
-          </a>
+          </Link>
         </div>
       </div>
     );

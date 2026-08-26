@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Logo } from '@/components/shared/logo';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 interface VerificationStatus {
   verification_status: string;
@@ -83,8 +85,8 @@ export default function RiderOnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-embee-white">
+        <div className="text-embee-slate">Loading...</div>
       </div>
     );
   }
@@ -99,38 +101,28 @@ export default function RiderOnboardingPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-embee-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <Link href="/" className="text-center block">
-            <h1 className="text-3xl font-bold text-primary">MBEENEXUS</h1>
+            <Logo variant="full" size="lg" theme="dark" />
           </Link>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">
+          <h2 className="mt-6 text-2xl font-bold text-embee-charcoal">
             Complete Your Registration
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-embee-slate">
             Upload your documents to get verified
           </p>
         </div>
 
         {/* Verification Status */}
         <div className="bg-white shadow rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Verification Status</h3>
+          <h3 className="text-lg font-medium text-embee-charcoal mb-4">Verification Status</h3>
           <div className="flex items-center">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              status?.verification_status === 'approved' ? 'bg-green-100 text-green-800' :
-              status?.verification_status === 'rejected' ? 'bg-red-100 text-red-800' :
-              status?.verification_status === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
-              {status?.verification_status === 'approved' ? 'Approved' :
-               status?.verification_status === 'rejected' ? 'Rejected' :
-               status?.verification_status === 'under_review' ? 'Under Review' :
-               'Pending'}
-            </span>
+            <StatusBadge status={status?.verification_status || 'pending'} />
           </div>
           {status?.verification_notes && (
-            <p className="mt-2 text-sm text-gray-600">{status.verification_notes}</p>
+            <p className="mt-2 text-sm text-embee-slate">{status.verification_notes}</p>
           )}
         </div>
 
@@ -142,35 +134,27 @@ export default function RiderOnboardingPage() {
 
         {/* Documents */}
         <div className="bg-white shadow rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Required Documents</h3>
+          <h3 className="text-lg font-medium text-embee-charcoal mb-4">Required Documents</h3>
           <div className="space-y-4">
             {DOCUMENT_TYPES.map((docType) => {
               const doc = getDocumentStatus(docType.value);
               const isUploading = uploading === docType.value;
 
               return (
-                <div key={docType.value} className="border border-gray-200 rounded-lg p-4">
+                <div key={docType.value} className="border border-embee-slate/20 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-gray-900">{docType.label}</h4>
-                      <p className="text-sm text-gray-500">{docType.description}</p>
+                      <h4 className="font-medium text-embee-charcoal">{docType.label}</h4>
+                      <p className="text-sm text-embee-slate">{docType.description}</p>
                     </div>
                     <div>
                       {doc ? (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          doc.status === 'approved' ? 'bg-green-100 text-green-800' :
-                          doc.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {doc.status === 'approved' ? 'Approved' :
-                           doc.status === 'rejected' ? 'Rejected' :
-                           'Pending'}
-                        </span>
+                        <StatusBadge status={doc.status} />
                       ) : (
                         <button
                           onClick={() => handleDocumentUpload(docType.value)}
                           disabled={isUploading}
-                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-embee-blue hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
                         >
                           {isUploading ? 'Uploading...' : 'Upload'}
                         </button>
@@ -190,8 +174,8 @@ export default function RiderOnboardingPage() {
 
         {/* Status Message */}
         {allDocumentsSubmitted && status?.verification_status === 'pending' && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
+          <div className="bg-embee-blue/5 border border-embee-blue/20 rounded-lg p-4 mb-6">
+            <p className="text-sm text-embee-blue">
               Your documents have been submitted. Our team will review them shortly.
               You will be notified once your account is approved.
             </p>
@@ -213,7 +197,7 @@ export default function RiderOnboardingPage() {
         )}
 
         <div className="text-center">
-          <Link href="/rider/dashboard" className="text-sm text-primary-600 hover:text-primary-500">
+          <Link href="/rider/dashboard" className="text-sm text-embee-blue hover:text-embee-blue/80">
             Skip to Dashboard →
           </Link>
         </div>

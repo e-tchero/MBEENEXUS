@@ -185,7 +185,7 @@ export function RiderDashboard({ riderProfile }: RiderDashboardProps) {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="text-gray-500">Loading dashboard...</div>
+        <div className="text-embee-slate">Loading dashboard...</div>
       </div>
     );
   }
@@ -195,8 +195,8 @@ export function RiderDashboard({ riderProfile }: RiderDashboardProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500">Welcome back, {riderProfile.full_name}</p>
+          <h1 className="text-2xl font-bold text-embee-charcoal">Dashboard</h1>
+          <p className="text-sm text-embee-slate">Welcome back, {riderProfile.full_name}</p>
         </div>
         <AvailabilityToggle
           initialAvailable={isAvailable}
@@ -233,7 +233,7 @@ export function RiderDashboard({ riderProfile }: RiderDashboardProps) {
           {/* Incoming Offers */}
           {!activeAssignment && isAvailable && offers.length > 0 && (
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-3">
+              <h2 className="text-lg font-medium text-embee-charcoal mb-3">
                 Incoming Offers ({offers.length})
               </h2>
               <div className="space-y-3">
@@ -254,17 +254,17 @@ export function RiderDashboard({ riderProfile }: RiderDashboardProps) {
             <div className="text-center py-12 bg-white shadow rounded-lg">
               {isAvailable ? (
                 <>
-                  <div className="text-gray-400 text-4xl mb-4">🔍</div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-1">Waiting for deliveries</h3>
-                  <p className="text-sm text-gray-500">
+                  <div className="text-embee-slate/50 text-4xl mb-4">🔍</div>
+                  <h3 className="text-lg font-medium text-embee-charcoal mb-1">Waiting for deliveries</h3>
+                  <p className="text-sm text-embee-slate">
                     New delivery offers will appear here when available.
                   </p>
                 </>
               ) : (
                 <>
-                  <div className="text-gray-400 text-4xl mb-4">⏸️</div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-1">You&apos;re offline</h3>
-                  <p className="text-sm text-gray-500">
+                  <div className="text-embee-slate/50 text-4xl mb-4">⏸️</div>
+                  <h3 className="text-lg font-medium text-embee-charcoal mb-1">You&apos;re offline</h3>
+                  <p className="text-sm text-embee-slate">
                     Go online to start receiving delivery offers.
                   </p>
                 </>

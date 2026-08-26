@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Logo } from '@/components/shared/logo';
 
 type VehicleType = 'bicycle' | 'motorcycle' | 'tricycle' | 'car' | 'van';
 
@@ -103,30 +104,30 @@ export default function RiderRegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-embee-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <Link href="/" className="text-center block">
-            <h1 className="text-3xl font-bold text-primary">MBEENEXUS</h1>
+            <Logo variant="full" size="lg" theme="dark" />
           </Link>
-          <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
+          <h2 className="mt-6 text-center text-2xl font-bold text-embee-charcoal">
             Become a Rider
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-embee-slate">
             Join our delivery team and earn
           </p>
         </div>
 
         {/* Progress Steps */}
         <div className="flex justify-center space-x-4">
-          <div className={`flex items-center ${step >= 1 ? 'text-primary' : 'text-gray-400'}`}>
-            <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${step >= 1 ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
+          <div className={`flex items-center ${step >= 1 ? 'text-embee-blue' : 'text-embee-slate/50'}`}>
+            <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${step >= 1 ? 'border-embee-blue bg-embee-blue text-white' : 'border-embee-slate/30'}`}>
               1
             </span>
             <span className="ml-2 text-sm font-medium">Account</span>
           </div>
-          <div className={`flex items-center ${step >= 2 ? 'text-primary' : 'text-gray-400'}`}>
-            <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${step >= 2 ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
+          <div className={`flex items-center ${step >= 2 ? 'text-embee-blue' : 'text-embee-slate/50'}`}>
+            <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${step >= 2 ? 'border-embee-blue bg-embee-blue text-white' : 'border-embee-slate/30'}`}>
               2
             </span>
             <span className="ml-2 text-sm font-medium">Vehicle</span>
@@ -144,7 +145,7 @@ export default function RiderRegisterPage() {
           <form className="mt-8 space-y-6" onSubmit={handleAccountSubmit}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="fullName" className="block text-sm font-medium text-embee-charcoal">
                   Full Name
                 </label>
                 <input
@@ -153,13 +154,13 @@ export default function RiderRegisterPage() {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                   placeholder="John Doe"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-embee-charcoal">
                   Email address
                 </label>
                 <input
@@ -169,13 +170,13 @@ export default function RiderRegisterPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                   placeholder="you@example.com"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-embee-charcoal">
                   Password
                 </label>
                 <input
@@ -185,13 +186,13 @@ export default function RiderRegisterPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                   placeholder="••••••••"
                 />
               </div>
 
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="phone" className="block text-sm font-medium text-embee-charcoal">
                   Phone Number (optional)
                 </label>
                 <input
@@ -199,7 +200,7 @@ export default function RiderRegisterPage() {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                   placeholder="080XXXXXXXX"
                 />
               </div>
@@ -207,14 +208,14 @@ export default function RiderRegisterPage() {
 
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-embee-blue hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue"
             >
               Continue
             </button>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-embee-slate">
               Already have an account?{' '}
-              <Link href="/login" className="font-medium text-primary-600 hover:text-primary-500">
+              <Link href="/login" className="font-medium text-embee-blue hover:text-embee-blue/80">
                 Sign in
               </Link>
             </p>
@@ -226,14 +227,14 @@ export default function RiderRegisterPage() {
           <form className="mt-8 space-y-6" onSubmit={handleVehicleSubmit}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="vehicleType" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="vehicleType" className="block text-sm font-medium text-embee-charcoal">
                   Vehicle Type
                 </label>
                 <select
                   id="vehicleType"
                   value={vehicleType}
                   onChange={(e) => setVehicleType(e.target.value as VehicleType)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                 >
                   <option value="bicycle">Bicycle</option>
                   <option value="motorcycle">Motorcycle</option>
@@ -245,7 +246,7 @@ export default function RiderRegisterPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="vehicleMake" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="vehicleMake" className="block text-sm font-medium text-embee-charcoal">
                     Make
                   </label>
                   <input
@@ -253,13 +254,13 @@ export default function RiderRegisterPage() {
                     type="text"
                     value={vehicleMake}
                     onChange={(e) => setVehicleMake(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                     placeholder="Honda"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="vehicleModel" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="vehicleModel" className="block text-sm font-medium text-embee-charcoal">
                     Model
                   </label>
                   <input
@@ -267,7 +268,7 @@ export default function RiderRegisterPage() {
                     type="text"
                     value={vehicleModel}
                     onChange={(e) => setVehicleModel(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                     placeholder="CBR 250"
                   />
                 </div>
@@ -275,7 +276,7 @@ export default function RiderRegisterPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="vehicleYear" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="vehicleYear" className="block text-sm font-medium text-embee-charcoal">
                     Year
                   </label>
                   <input
@@ -285,13 +286,13 @@ export default function RiderRegisterPage() {
                     max="2030"
                     value={vehicleYear}
                     onChange={(e) => setVehicleYear(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                     placeholder="2020"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="registrationNumber" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="registrationNumber" className="block text-sm font-medium text-embee-charcoal">
                     Registration No.
                   </label>
                   <input
@@ -299,7 +300,7 @@ export default function RiderRegisterPage() {
                     type="text"
                     value={registrationNumber}
                     onChange={(e) => setRegistrationNumber(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-embee-slate/30 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                     placeholder="ABJ-123-456"
                   />
                 </div>
@@ -310,14 +311,14 @@ export default function RiderRegisterPage() {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="flex-1 py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="flex-1 py-3 px-4 border border-embee-slate/30 rounded-md shadow-sm text-sm font-medium text-embee-charcoal bg-white hover:bg-embee-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+                className="flex-1 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-embee-blue hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
               >
                 {loading ? 'Creating account...' : 'Create Account'}
               </button>

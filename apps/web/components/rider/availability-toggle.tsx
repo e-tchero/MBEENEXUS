@@ -45,8 +45,8 @@ export function AvailabilityToggle({ initialAvailable, onStatusChange }: Availab
         disabled={loading}
         className={`
           relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
-          transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-          ${isAvailable ? 'bg-green-500' : 'bg-gray-300'}
+          transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-embee-blue focus:ring-offset-2
+          ${isAvailable ? 'bg-green-500' : 'bg-embee-slate/30'}
           ${loading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
         role="switch"
@@ -61,7 +61,7 @@ export function AvailabilityToggle({ initialAvailable, onStatusChange }: Availab
           `}
         />
       </button>
-      <span className="text-sm font-medium text-gray-700">
+      <span className="text-sm font-medium text-embee-charcoal">
         {isAvailable ? 'Online' : 'Offline'}
       </span>
       {error && (

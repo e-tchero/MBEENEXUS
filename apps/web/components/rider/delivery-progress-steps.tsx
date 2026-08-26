@@ -33,21 +33,21 @@ export function DeliveryProgressSteps({ currentStatus }: DeliveryProgressStepsPr
                 className={`
                   w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium
                   ${isCompleted ? 'bg-green-500 text-white' : ''}
-                  ${isCurrent ? 'bg-blue-500 text-white ring-2 ring-blue-200' : ''}
-                  ${!isCompleted && !isCurrent ? 'bg-gray-200 text-gray-500' : ''}
+                  ${isCurrent ? 'bg-embee-blue text-white ring-2 ring-embee-blue/20' : ''}
+                  ${!isCompleted && !isCurrent ? 'bg-embee-slate/20 text-embee-slate' : ''}
                 `}
               >
                 {isCompleted ? '✓' : index + 1}
               </div>
               {/* Label */}
-              <span className={`text-xs mt-1 text-center ${isCurrent ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+              <span className={`text-xs mt-1 text-center ${isCurrent ? 'text-embee-blue font-medium' : 'text-embee-slate'}`}>
                 {step.label}
               </span>
               {/* Connector line */}
               {index < 5 && (
                 <div
                   className={`absolute h-0.5 w-full ${
-                    isCompleted ? 'bg-green-500' : 'bg-gray-200'
+                    isCompleted ? 'bg-green-500' : 'bg-embee-slate/20'
                   }`}
                   style={{ top: '16px', left: '50%', right: '-50%', zIndex: 0 }}
                 />

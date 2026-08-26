@@ -89,7 +89,7 @@ export function EarningsPanel({ initialSummary }: EarningsPanelProps) {
 
   return (
     <div className="bg-white shadow rounded-lg p-4">
-      <h3 className="text-sm font-medium text-gray-900 mb-4">Earnings</h3>
+      <h3 className="text-sm font-medium text-embee-charcoal mb-4">Earnings</h3>
 
       {error && (
         <p className="text-xs text-red-600 mb-3">{error}</p>
@@ -97,16 +97,16 @@ export function EarningsPanel({ initialSummary }: EarningsPanelProps) {
 
       {/* Summary */}
       {loading ? (
-        <div className="text-sm text-gray-500 mb-4">Loading...</div>
+        <div className="text-sm text-embee-slate mb-4">Loading...</div>
       ) : summary ? (
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Total Earned</p>
-            <p className="text-lg font-semibold text-gray-900">{formatCurrency(summary.total_earnings)}</p>
+          <div className="bg-embee-white rounded-lg p-3">
+            <p className="text-xs text-embee-slate">Total Earned</p>
+            <p className="text-lg font-semibold text-embee-charcoal">{formatCurrency(summary.total_earnings)}</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Deliveries</p>
-            <p className="text-lg font-semibold text-gray-900">{summary.total_deliveries}</p>
+          <div className="bg-embee-white rounded-lg p-3">
+            <p className="text-xs text-embee-slate">Deliveries</p>
+            <p className="text-lg font-semibold text-embee-charcoal">{summary.total_deliveries}</p>
           </div>
           <div className="bg-yellow-50 rounded-lg p-3">
             <p className="text-xs text-yellow-600">Pending</p>
@@ -121,22 +121,22 @@ export function EarningsPanel({ initialSummary }: EarningsPanelProps) {
 
       {/* History */}
       <div className="border-t pt-4">
-        <h4 className="text-xs font-medium text-gray-500 uppercase mb-3">Recent Earnings</h4>
+        <h4 className="text-xs font-medium text-embee-slate uppercase mb-3">Recent Earnings</h4>
         {historyLoading && history.length === 0 ? (
-          <div className="text-sm text-gray-500">Loading...</div>
+          <div className="text-sm text-embee-slate">Loading...</div>
         ) : history.length === 0 ? (
-          <div className="text-sm text-gray-500">No earnings yet</div>
+          <div className="text-sm text-embee-slate">No earnings yet</div>
         ) : (
           <div className="space-y-2">
             {history.map((entry) => (
-              <div key={entry.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+              <div key={entry.id} className="flex items-center justify-between py-2 border-b border-embee-slate/10 last:border-0">
                 <div>
-                  <p className="text-sm text-gray-700">{entry.description || 'Delivery earnings'}</p>
-                  <p className="text-xs text-gray-500">{formatDate(entry.created_at)}</p>
+                  <p className="text-sm text-embee-charcoal">{entry.description || 'Delivery earnings'}</p>
+                  <p className="text-xs text-embee-slate">{formatDate(entry.created_at)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-green-600">+{formatCurrency(entry.amount)}</p>
-                  <p className="text-xs text-gray-500">Bal: {formatCurrency(entry.balance_after)}</p>
+                  <p className="text-xs text-embee-slate">Bal: {formatCurrency(entry.balance_after)}</p>
                 </div>
               </div>
             ))}
@@ -144,7 +144,7 @@ export function EarningsPanel({ initialSummary }: EarningsPanelProps) {
               <button
                 onClick={() => setPage(prev => prev + 1)}
                 disabled={historyLoading}
-                className="w-full py-2 text-sm text-primary-600 hover:text-primary-700 disabled:opacity-50"
+                className="w-full py-2 text-sm text-embee-blue hover:text-embee-blue/80 disabled:opacity-50"
               >
                 {historyLoading ? 'Loading...' : 'Load more'}
               </button>
