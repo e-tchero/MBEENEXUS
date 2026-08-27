@@ -18,6 +18,15 @@ const TRACKING_STATUSES = [
   'picked_up', 'in_transit', 'arrived_at_destination',
 ];
 
+/**
+ * TrackingMap — interactive map for order tracking.
+ *
+ * Uses MapLibre GL JS (open-source) with Stadia Maps vector tiles.
+ * Attribution: © Stadia Maps, © OpenMapTiles, © OpenStreetMap contributors
+ *
+ * MapLibre GL JS is API-compatible with Mapbox GL JS v1.
+ * Migration from Mapbox: import rename + style URL change.
+ */
 export function TrackingMap({
   pickupLat,
   pickupLng,
@@ -29,8 +38,10 @@ export function TrackingMap({
   status,
 }: TrackingMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const riderMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const riderMarkerRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(false);
 
@@ -39,41 +50,39 @@ export function TrackingMap({
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
 
-    const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-    if (!token) {
-      setMapError(true);
-      return;
-    }
-
     let cancelled = false;
 
-    import('mapbox-gl').then((mapboxgl) => {
+    import('maplibre-gl').then((maplibregl) => {
       if (cancelled || !mapContainer.current) return;
 
-      mapboxgl.default.accessToken = token;
+      const mgl = maplibregl;
 
-      const map = new mapboxgl.default.Map({
+      // Stadia Maps vector tile style (free for localhost, API key for production)
+      // Attribution: © Stadia Maps, © OpenMapTiles, © OpenStreetMap contributors
+      const styleUrl = 'https://tiles.stadiamaps.com/styles/alidade_smooth.json';
+
+      const map = new mgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: styleUrl,
         center: [pickupLng, pickupLat],
         zoom: 13,
       });
 
-      map.addControl(new mapboxgl.default.NavigationControl(), 'top-right');
+      map.addControl(new mgl.NavigationControl(), 'top-right');
 
       map.on('load', () => {
         if (cancelled) return;
 
         // Pickup marker (green)
-        new mapboxgl.default.Marker({ color: '#22c55e' })
+        new mgl.Marker({ color: '#22c55e' })
           .setLngLat([pickupLng, pickupLat])
-          .setPopup(new mapboxgl.default.Popup().setText('Pickup'))
+          .setPopup(new mgl.Popup().setText('Pickup'))
           .addTo(map);
 
         // Destination marker (red)
-        new mapboxgl.default.Marker({ color: '#ef4444' })
+        new mgl.Marker({ color: '#ef4444' })
           .setLngLat([destinationLng, destinationLat])
-          .setPopup(new mapboxgl.default.Popup().setText('Destination'))
+          .setPopup(new mgl.Popup().setText('Destination'))
           .addTo(map);
 
         // Route line
@@ -101,14 +110,14 @@ export function TrackingMap({
             'line-cap': 'round',
           },
           paint: {
-            'line-color': '#6366f1',
+            'line-color': '#147BFF',
             'line-width': 3,
             'line-opacity': 0.6,
           },
         });
 
         // Fit bounds to show both points
-        const bounds = new mapboxgl.default.LngLatBounds();
+        const bounds = new mgl.LngLatBounds();
         bounds.extend([pickupLng, pickupLat]);
         bounds.extend([destinationLng, destinationLat]);
         if (showRider && riderLat && riderLng) {
@@ -120,12 +129,12 @@ export function TrackingMap({
         if (showRider && riderLat && riderLng) {
           const el = document.createElement('div');
           el.className = 'rider-marker';
-          el.style.cssText = 'width:32px;height:32px;background:#3b82f6;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;';
+          el.style.cssText = 'width:32px;height:32px;background:#147BFF;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;';
           el.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
 
-          riderMarkerRef.current = new mapboxgl.default.Marker({ element: el })
+          riderMarkerRef.current = new mgl.Marker({ element: el })
             .setLngLat([riderLng, riderLat])
-            .setPopup(new mapboxgl.default.Popup().setText('Rider'))
+            .setPopup(new mgl.Popup().setText('Rider'))
             .addTo(map);
         }
 
@@ -156,10 +165,10 @@ export function TrackingMap({
 
   if (mapError) {
     return (
-      <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-        <div className="text-center text-gray-500">
+      <div className="w-full h-64 bg-embee-white rounded-lg flex items-center justify-center">
+        <div className="text-center text-embee-slate">
           <p className="text-sm font-medium">Map unavailable</p>
-          <p className="text-xs mt-1">Check NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN</p>
+          <p className="text-xs mt-1">Check mapping configuration</p>
         </div>
       </div>
     );
@@ -169,10 +178,14 @@ export function TrackingMap({
     <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-lg overflow-hidden">
       <div ref={mapContainer} className="w-full h-full" />
       {!mapLoaded && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-          <div className="text-gray-500 text-sm">Loading map...</div>
+        <div className="absolute inset-0 bg-embee-white flex items-center justify-center">
+          <div className="text-embee-slate text-sm">Loading map...</div>
         </div>
       )}
+      {/* MapLibre / Stadia Maps / OpenStreetMap attribution */}
+      <div className="absolute bottom-0 left-0 right-0 bg-white/80 text-[10px] text-embee-slate px-2 py-1 text-center">
+        © <a href="https://stadiamaps.com/" target="_blank" rel="noopener noreferrer" className="underline">Stadia Maps</a>, © <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer" className="underline">OpenMapTiles</a>, © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline">OpenStreetMap</a> contributors
+      </div>
     </div>
   );
 }

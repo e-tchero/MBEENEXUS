@@ -1,7 +1,7 @@
 import type { MapsProvider, GeocodingResult, RouteResult } from './types';
 
 /**
- * Mapbox Maps Provider — MBEENEXUS MVP
+ * Mapbox Maps Provider — Embee Nexus (legacy)
  *
  * Free tier limits:
  * - Directions API: 100,000 requests/month
@@ -9,7 +9,7 @@ import type { MapsProvider, GeocodingResult, RouteResult } from './types';
  * - Map Matching: 100,000 requests/month
  * - Geocoding: 100,000 requests/month
  *
- * When MBEENEXUS scales, this can be swapped for Google Maps
+ * When Embee Nexus scales, this can be swapped for Google Maps
  * without changing any business logic (provider abstraction).
  */
 export class MapboxProvider implements MapsProvider {
