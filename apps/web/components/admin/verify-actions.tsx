@@ -55,7 +55,7 @@ export function VerifyActions({
   const isTerminal = currentStatus === 'approved' || currentStatus === 'rejected';
 
   return (
-    <div className="bg-white rounded-xl p-6 border border-gray-200">
+    <div className="bg-white rounded-xl p-6 border border-embee-slate/20">
       <h2 className="text-lg font-semibold text-embee-charcoal mb-4">
         Verification Actions
       </h2>
@@ -78,7 +78,7 @@ export function VerifyActions({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-embee-blue"
+              className="w-full px-3 py-2 border border-embee-slate/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-embee-blue"
               rows={2}
               placeholder="Add verification notes..."
             />
@@ -130,7 +130,7 @@ export function VerifyActions({
                     setRejectionReason('');
                   }}
                   disabled={isProcessing}
-                  className="px-4 py-2 bg-white text-embee-charcoal text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-white text-embee-charcoal text-sm font-medium rounded-lg border border-embee-slate/30 hover:bg-embee-white disabled:opacity-50 transition-colors"
                 >
                   Cancel
                 </button>

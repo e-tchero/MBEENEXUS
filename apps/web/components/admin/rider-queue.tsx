@@ -48,7 +48,7 @@ function getStatusBadge(status: string) {
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-        styles[status] || 'bg-gray-100 text-gray-800'
+        styles[status] || 'bg-embee-slate/10 text-embee-charcoal'
       }`}
     >
       {labels[status] || status}
@@ -89,7 +89,7 @@ export function RiderQueue({ riders, currentFilter, totalCount }: RiderQueueProp
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 currentFilter === option.value || (!currentFilter && !option.value)
                   ? 'bg-embee-blue text-white'
-                  : 'bg-white text-embee-charcoal border border-gray-200 hover:border-embee-blue'
+                  : 'bg-white text-embee-charcoal border border-embee-slate/20 hover:border-embee-blue'
               }`}
             >
               {option.label}
@@ -103,7 +103,7 @@ export function RiderQueue({ riders, currentFilter, totalCount }: RiderQueueProp
 
       {/* Rider List */}
       {riders.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
+        <div className="bg-white rounded-xl p-12 border border-embee-slate/20 text-center">
           <div className="text-4xl mb-4">🏍️</div>
           <h3 className="text-lg font-medium text-embee-charcoal mb-2">
             No riders found
@@ -115,9 +115,9 @@ export function RiderQueue({ riders, currentFilter, totalCount }: RiderQueueProp
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-white rounded-xl border border-embee-slate/20 overflow-hidden">
+          <table className="min-w-full divide-y divide-embee-slate/20">
+            <thead className="bg-embee-white">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-embee-slate uppercase tracking-wider">
                   Rider
@@ -136,13 +136,13 @@ export function RiderQueue({ riders, currentFilter, totalCount }: RiderQueueProp
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-embee-slate/20">
               {riders.map((rider) => {
                 const docSummary = getDocumentSummary(rider.documents);
                 return (
                   <tr
                     key={rider.id}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-embee-white transition-colors"
                   >
                     <td className="px-6 py-4">
                       <div>

@@ -46,7 +46,7 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Link
           href="/admin/riders?status=pending"
-          className="bg-white rounded-xl p-6 border border-gray-200 hover:border-embee-blue transition-colors"
+          className="bg-white rounded-xl p-6 border border-embee-slate/20 hover:border-embee-blue transition-colors"
         >
           <p className="text-sm font-medium text-embee-slate mb-1">Pending</p>
           <p className="text-3xl font-bold text-embee-charcoal">
@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
 
         <Link
           href="/admin/riders?status=under_review"
-          className="bg-white rounded-xl p-6 border border-gray-200 hover:border-embee-blue transition-colors"
+          className="bg-white rounded-xl p-6 border border-embee-slate/20 hover:border-embee-blue transition-colors"
         >
           <p className="text-sm font-medium text-embee-slate mb-1">Under Review</p>
           <p className="text-3xl font-bold text-embee-charcoal">
@@ -68,7 +68,7 @@ export default async function AdminDashboardPage() {
 
         <Link
           href="/admin/riders?status=approved"
-          className="bg-white rounded-xl p-6 border border-gray-200 hover:border-embee-blue transition-colors"
+          className="bg-white rounded-xl p-6 border border-embee-slate/20 hover:border-embee-blue transition-colors"
         >
           <p className="text-sm font-medium text-embee-slate mb-1">Approved</p>
           <p className="text-3xl font-bold text-embee-charcoal">
@@ -79,7 +79,7 @@ export default async function AdminDashboardPage() {
 
         <Link
           href="/admin/riders?status=rejected"
-          className="bg-white rounded-xl p-6 border border-gray-200 hover:border-embee-blue transition-colors"
+          className="bg-white rounded-xl p-6 border border-embee-slate/20 hover:border-embee-blue transition-colors"
         >
           <p className="text-sm font-medium text-embee-slate mb-1">Rejected</p>
           <p className="text-3xl font-bold text-embee-charcoal">
@@ -90,7 +90,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200">
+      <div className="bg-white rounded-xl p-6 border border-embee-slate/20">
         <h2 className="text-lg font-semibold text-embee-charcoal mb-4">
           Quick Actions
         </h2>
@@ -103,7 +103,7 @@ export default async function AdminDashboardPage() {
           </Link>
           <Link
             href="/admin/riders"
-            className="inline-flex items-center px-4 py-2 bg-white text-embee-charcoal border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-white text-embee-charcoal border border-embee-slate/30 rounded-lg font-medium hover:bg-embee-white transition-colors"
           >
             View All Riders
           </Link>

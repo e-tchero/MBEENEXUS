@@ -69,7 +69,7 @@ function getStatusBadge(status: string) {
   return (
     <span
       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-        styles[status] || 'bg-gray-100 text-gray-800'
+        styles[status] || 'bg-embee-slate/10 text-embee-charcoal'
       }`}
     >
       {labels[status] || status}
@@ -114,7 +114,7 @@ export function RiderDetail({ rider }: RiderDetailProps) {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Rider Info */}
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="bg-white rounded-xl p-6 border border-embee-slate/20">
             <h2 className="text-lg font-semibold text-embee-charcoal mb-4">
               Rider Information
             </h2>
@@ -148,7 +148,7 @@ export function RiderDetail({ rider }: RiderDetailProps) {
 
           {/* Vehicle Info */}
           {rider.vehicle && (
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded-xl p-6 border border-embee-slate/20">
               <h2 className="text-lg font-semibold text-embee-charcoal mb-4">
                 Vehicle Information
               </h2>
@@ -188,7 +188,7 @@ export function RiderDetail({ rider }: RiderDetailProps) {
           )}
 
           {/* Documents */}
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="bg-white rounded-xl p-6 border border-embee-slate/20">
             <h2 className="text-lg font-semibold text-embee-charcoal mb-4">
               Verification Documents
             </h2>

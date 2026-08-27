@@ -21,7 +21,7 @@ function getStatusBadge(status: string) {
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-        styles[status] || 'bg-gray-100 text-gray-800'
+        styles[status] || 'bg-embee-slate/10 text-embee-charcoal'
       }`}
     >
       {status.replace('_', ' ')}
@@ -31,7 +31,7 @@ function getStatusBadge(status: string) {
 
 export function VerificationHistory({ history }: VerificationHistoryProps) {
   return (
-    <div className="bg-white rounded-xl p-6 border border-gray-200">
+    <div className="bg-white rounded-xl p-6 border border-embee-slate/20">
       <h2 className="text-lg font-semibold text-embee-charcoal mb-4">
         Verification History
       </h2>
@@ -43,7 +43,7 @@ export function VerificationHistory({ history }: VerificationHistoryProps) {
           {history.map((entry) => (
             <div key={entry.id} className="flex gap-3">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-embee-white rounded-full flex items-center justify-center">
                   <span className="text-xs text-embee-slate">
                     {entry.changed_by_name.charAt(0).toUpperCase()}
                   </span>

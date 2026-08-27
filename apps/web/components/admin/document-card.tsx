@@ -37,7 +37,7 @@ function getStatusBadge(status: string) {
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-        styles[status] || 'bg-gray-100 text-gray-800'
+        styles[status] || 'bg-embee-slate/10 text-embee-charcoal'
       }`}
     >
       {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -86,7 +86,7 @@ export function DocumentCard({ document, onActionComplete }: DocumentCardProps) 
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4">
+    <div className="border border-embee-slate/20 rounded-lg p-4">
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export function DocumentCard({ document, onActionComplete }: DocumentCardProps) 
                 setRejectionReason('');
               }}
               disabled={isProcessing}
-              className="px-3 py-1.5 bg-white text-embee-charcoal text-xs font-medium rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="px-3 py-1.5 bg-white text-embee-charcoal text-xs font-medium rounded-lg border border-embee-slate/30 hover:bg-embee-white disabled:opacity-50 transition-colors"
             >
               Cancel
             </button>
