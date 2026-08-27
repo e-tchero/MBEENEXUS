@@ -16,6 +16,8 @@ export interface RouteResult {
   distance_km: number;
   duration_minutes: number;
   polyline?: string;
+  /** Decoded route coordinates [lng, lat][] for map rendering */
+  coordinates?: [number, number][];
 }
 
 export interface MapsProvider {
@@ -29,4 +31,9 @@ export interface MapsProvider {
     origin: { lat: number; lon: number },
     destination: { lat: number; lon: number }
   ): Promise<RouteResult>;
+  /** Optional: search-as-you-type address autocomplete. Cost-optimized (1 credit vs 20 for geocoding). */
+  autocomplete?(
+    query: string,
+    location?: { lat: number; lon: number }
+  ): Promise<GeocodingResult[]>;
 }

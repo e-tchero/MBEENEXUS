@@ -81,11 +81,11 @@ export function OrderTimeline({ events, currentStatus }: OrderTimelineProps) {
                   className={`w-2.5 h-2.5 rounded-full mt-1 ${
                     completed
                       ? 'bg-embee-blue'
-                      : 'bg-gray-200'
+                      : 'bg-embee-slate/20'
                   }`}
                 />
                 {!isLast && (
-                  <div className={`w-0.5 flex-1 ${completed ? 'bg-embee-blue/20' : 'bg-gray-200'}`} />
+                  <div className={`w-0.5 flex-1 ${completed ? 'bg-embee-blue/20' : 'bg-embee-slate/20'}`} />
                 )}
               </div>
               <div className="pb-3 min-w-0">

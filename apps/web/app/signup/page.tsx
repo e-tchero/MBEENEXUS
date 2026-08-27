@@ -106,7 +106,7 @@ export default function SignupPage() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                 placeholder="John Doe"
               />
             </div>
@@ -123,7 +123,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                 placeholder="you@example.com"
               />
             </div>
@@ -140,7 +140,7 @@ export default function SignupPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -157,7 +157,7 @@ export default function SignupPage() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
                 placeholder="••••••••"
               />
             </div>

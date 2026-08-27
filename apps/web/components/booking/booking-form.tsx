@@ -94,7 +94,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
           required
           value={form.pickup_address_id}
           onChange={(e) => setForm({ ...form, pickup_address_id: e.target.value })}
-          className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+          className="block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
         >
           <option value="">Select pickup address</option>
           {addresses.map((addr) => (
@@ -114,7 +114,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
           required
           value={form.destination_address_id}
           onChange={(e) => setForm({ ...form, destination_address_id: e.target.value })}
-          className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+          className="block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
         >
           <option value="">Select destination address</option>
           {addresses.map((addr) => (
@@ -134,7 +134,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
           required
           value={form.category_id}
           onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-          className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+          className="block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
         >
           <option value="">Select category</option>
           {categories.map((cat) => (
@@ -158,7 +158,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
             value={form.weight_kg}
             onChange={(e) => setForm({ ...form, weight_kg: e.target.value })}
             placeholder="Optional"
-            className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+            className="block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
           />
         </div>
         <div>
@@ -171,7 +171,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
             max="100"
             value={form.quantity}
             onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-            className="block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+            className="block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
           />
         </div>
       </div>
@@ -189,7 +189,7 @@ export function BookingForm({ addresses, categories, onQuoteGenerated }: Booking
               className={`py-2 px-4 border rounded-md text-sm font-medium ${
                 form.urgency_level === level
                   ? 'bg-embee-blue/10 border-embee-blue text-embee-blue'
-                  : 'bg-white border-gray-200 text-embee-charcoal hover:bg-embee-white'
+                  : 'bg-white border-embee-slate/20 text-embee-charcoal hover:bg-embee-white'
               }`}
             >
               {level.charAt(0).toUpperCase() + level.slice(1)}

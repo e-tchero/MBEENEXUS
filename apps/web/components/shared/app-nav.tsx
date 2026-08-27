@@ -25,7 +25,7 @@ export function AppNav({ brand = 'customer', links, user, signOutAction = '/auth
 
   return (
     <>
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <nav className="bg-white border-b border-embee-slate/20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Left: Logo + links */}
@@ -47,7 +47,7 @@ export function AppNav({ brand = 'customer', links, user, signOutAction = '/auth
                       'text-sm font-medium transition-colors px-1 py-1 border-b-2',
                       pathname === link.href || pathname.startsWith(link.href + '/')
                         ? 'border-embee-blue text-embee-blue'
-                        : 'border-transparent text-embee-slate hover:text-embee-charcoal hover:border-gray-300'
+                        : 'border-transparent text-embee-slate hover:text-embee-charcoal hover:border-embee-slate/30'
                     )}
                   >
                     {link.label}
@@ -75,7 +75,7 @@ export function AppNav({ brand = 'customer', links, user, signOutAction = '/auth
             <div className="flex items-center sm:hidden">
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-embee-slate hover:text-embee-charcoal hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-embee-blue"
+                className="inline-flex items-center justify-center p-2 rounded-md text-embee-slate hover:text-embee-charcoal hover:bg-embee-slate/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-embee-blue"
                 aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
               >
                 {mobileOpen ? (

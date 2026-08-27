@@ -11,6 +11,8 @@ interface TrackingMapProps {
   riderLng?: number | null;
   riderHeading?: number | null;
   status: string;
+  /** Decoded route coordinates [lng, lat][] from order.route_geometry */
+  routeGeometry?: [number, number][] | null;
 }
 
 const TRACKING_STATUSES = [
@@ -36,6 +38,7 @@ export function TrackingMap({
   riderLng,
   riderHeading,
   status,
+  routeGeometry,
 }: TrackingMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,17 +88,18 @@ export function TrackingMap({
           .setPopup(new mgl.Popup().setText('Destination'))
           .addTo(map);
 
-        // Route line
+        // Route line — use actual road geometry if available, fallback to straight line
+        const routeCoords = routeGeometry && routeGeometry.length > 0
+          ? routeGeometry
+          : [[pickupLng, pickupLat], [destinationLng, destinationLat]];
+
         map.addSource('route', {
           type: 'geojson',
           data: {
             type: 'Feature',
             geometry: {
               type: 'LineString',
-              coordinates: [
-                [pickupLng, pickupLat],
-                [destinationLng, destinationLat],
-              ],
+              coordinates: routeCoords,
             },
             properties: {},
           },
@@ -154,7 +158,7 @@ export function TrackingMap({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [pickupLat, pickupLng, destinationLat, destinationLng]);
+  }, [pickupLat, pickupLng, destinationLat, destinationLng, routeGeometry]);
 
   // Update rider marker position when props change
   useEffect(() => {

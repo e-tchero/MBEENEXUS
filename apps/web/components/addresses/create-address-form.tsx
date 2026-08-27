@@ -72,7 +72,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
             value={form.label}
             onChange={(e) => setForm({ ...form, label: e.target.value })}
             placeholder="e.g., Home, Office"
-            className="mt-1 block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+            className="mt-1 block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
           />
         </div>
 
@@ -86,7 +86,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
             required
             value={form.street_address}
             onChange={(e) => setForm({ ...form, street_address: e.target.value })}
-            className="mt-1 block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+            className="mt-1 block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
           />
         </div>
 
@@ -101,7 +101,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
               required
               value={form.city}
               onChange={(e) => setForm({ ...form, city: e.target.value })}
-              className="mt-1 block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+              className="mt-1 block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
             />
           </div>
           <div>
@@ -114,7 +114,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
               required
               value={form.state}
               onChange={(e) => setForm({ ...form, state: e.target.value })}
-              className="mt-1 block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+              className="mt-1 block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
             />
           </div>
         </div>
@@ -131,7 +131,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
               step="any"
               value={form.latitude || ''}
               onChange={(e) => setForm({ ...form, latitude: parseFloat(e.target.value) || 0 })}
-              className="mt-1 block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+              className="mt-1 block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
             />
           </div>
           <div>
@@ -145,7 +145,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
               step="any"
               value={form.longitude || ''}
               onChange={(e) => setForm({ ...form, longitude: parseFloat(e.target.value) || 0 })}
-              className="mt-1 block w-full border border-gray-200 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+              className="mt-1 block w-full border border-embee-slate/20 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
             />
           </div>
         </div>
@@ -156,7 +156,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
             id="is_default"
             checked={form.is_default}
             onChange={(e) => setForm({ ...form, is_default: e.target.checked })}
-            className="h-4 w-4 text-embee-blue focus:ring-embee-blue border-gray-300 rounded"
+            className="h-4 w-4 text-embee-blue focus:ring-embee-blue border-embee-slate/30 rounded"
           />
           <label htmlFor="is_default" className="ml-2 block text-sm text-embee-charcoal">
             Set as default address
@@ -168,7 +168,7 @@ export function CreateAddressForm({ onSuccess, onCancel }: CreateAddressFormProp
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 bg-white py-2 px-4 border border-gray-200 rounded-md shadow-sm text-sm font-medium text-embee-charcoal hover:bg-embee-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue"
+          className="flex-1 bg-white py-2 px-4 border border-embee-slate/20 rounded-md shadow-sm text-sm font-medium text-embee-charcoal hover:bg-embee-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue"
         >
           Cancel
         </button>

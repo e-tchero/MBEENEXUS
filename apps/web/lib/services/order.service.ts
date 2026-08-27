@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { getMapsProvider } from '@/lib/maps';
 import type { Order, Payment } from '@repo/shared/types';
 
 export interface CreateOrderInput {
@@ -83,7 +84,21 @@ export class OrderService {
       .eq('id', quote.pricing_rule_id)
       .single();
 
-    // 5. Create order
+    // 5. Calculate route geometry (one-time, stored on order for TrackingMap)
+    let routeGeometry: [number, number][] | null = null;
+    try {
+      const maps = getMapsProvider();
+      const route = await maps.getRoute(
+        { lat: quote.pickup_latitude, lon: quote.pickup_longitude },
+        { lat: quote.destination_latitude, lon: quote.destination_longitude }
+      );
+      routeGeometry = route.coordinates || null;
+    } catch {
+      // Route geometry is optional — tracking map falls back to straight line
+      console.warn('Failed to calculate route geometry for order');
+    }
+
+    // 6. Create order
     const orderId = crypto.randomUUID();
     const { data: order, error: orderError } = await serviceRole
       .from('orders')
@@ -124,6 +139,7 @@ export class OrderService {
         estimated_duration_minutes: quote.estimated_duration_minutes,
         urgency_level: 'standard',
         tracking_code: trackingCode,
+        route_geometry: routeGeometry ? JSON.parse(JSON.stringify(routeGeometry)) : null,
       })
       .select()
       .single();
@@ -133,7 +149,7 @@ export class OrderService {
       throw new Error('Failed to create order');
     }
 
-    // 6. Mark quote as consumed
+    // 7. Mark quote as consumed
     const { error: consumeError } = await serviceRole
       .from('delivery_quotes')
       .update({
@@ -148,7 +164,7 @@ export class OrderService {
       // Order is created, continue with payment
     }
 
-    // 7. Create order event
+    // 8. Create order event
     await serviceRole.from('order_events').insert({
       order_id: orderId,
       event_type: 'order_created',
@@ -162,7 +178,7 @@ export class OrderService {
       },
     });
 
-    // 8. Create order status history
+    // 9. Create order status history
     await serviceRole.from('order_status_history').insert({
       order_id: orderId,
       status: 'pending_payment',
@@ -170,7 +186,7 @@ export class OrderService {
       created_by: customerId,
     });
 
-    // 9. Create payment record
+    // 10. Create payment record
     const { data: payment, error: paymentError } = await serviceRole
       .from('payments')
       .insert({

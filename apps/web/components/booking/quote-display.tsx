@@ -129,7 +129,7 @@ export function QuoteDisplay({
               className={`py-2 px-4 border rounded-md text-sm font-medium ${
                 paymentMethod === method
                   ? 'bg-embee-blue/10 border-embee-blue text-embee-blue'
-                  : 'bg-white border-gray-200 text-embee-charcoal hover:bg-embee-white'
+                  : 'bg-white border-embee-slate/20 text-embee-charcoal hover:bg-embee-white'
               }`}
             >
               {method === 'card' ? 'Card' : method === 'bank_transfer' ? 'Bank Transfer' : 'USSD'}

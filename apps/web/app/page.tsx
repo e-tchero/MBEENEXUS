@@ -152,7 +152,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-embee-slate/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Logo variant="wordmark" size="sm" theme="light" href="/" />
@@ -209,7 +209,7 @@ export default function HomePage() {
               is the right platform for the job.
             </h1>
 
-            <p className="mt-6 text-lg sm:text-xl text-gray-300 max-w-2xl leading-relaxed">
+            <p className="mt-6 text-lg sm:text-xl text-embee-slate/60 max-w-2xl leading-relaxed">
               Book deliveries with instant quotes. Track your package in real time.
               Pay securely. Get proof of delivery — all on one modern platform.
             </p>
@@ -280,7 +280,7 @@ export default function HomePage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="group p-6 rounded-2xl border border-gray-100 hover:border-embee-blue/20 hover:shadow-lg hover:shadow-embee-blue/5 transition-all duration-200"
+                className="group p-6 rounded-2xl border border-embee-slate/10 hover:border-embee-blue/20 hover:shadow-lg hover:shadow-embee-blue/5 transition-all duration-200"
               >
                 <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-embee-blue/10 text-embee-blue mb-4 group-hover:bg-embee-blue group-hover:text-white transition-colors">
                   <feature.icon className="h-5 w-5" />
@@ -302,7 +302,7 @@ export default function HomePage() {
               <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                 Earn on your schedule
               </h2>
-              <p className="mt-4 text-lg text-gray-300 leading-relaxed">
+              <p className="mt-4 text-lg text-embee-slate/60 leading-relaxed">
                 Join the Embee Nexus rider network. Accept deliveries when you want, track your earnings, and grow with a verified platform.
               </p>
 
@@ -312,7 +312,7 @@ export default function HomePage() {
                     <div className="flex items-center justify-center w-5 h-5 rounded-full bg-embee-cyan/20">
                       <IconCheck className="h-3 w-3 text-embee-cyan" />
                     </div>
-                    <span className="text-gray-300">{benefit}</span>
+                    <span className="text-embee-slate/60">{benefit}</span>
                   </li>
                 ))}
               </ul>
@@ -337,7 +337,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="text-white font-semibold">Active Delivery</p>
-                    <p className="text-sm text-gray-400">Pickup → Destination</p>
+                    <p className="text-sm text-embee-slate/50">Pickup → Destination</p>
                   </div>
                 </div>
 
@@ -347,10 +347,10 @@ export default function HomePage() {
                       <div key={step} className="flex items-center gap-3">
                         <div
                           className={`w-2 h-2 rounded-full ${
-                            i < 3 ? 'bg-embee-cyan' : i === 3 ? 'bg-embee-blue animate-pulse' : 'bg-gray-600'
+                            i < 3 ? 'bg-embee-cyan' : i === 3 ? 'bg-embee-blue animate-pulse' : 'bg-embee-slate/60'
                           }`}
                         />
-                        <span className={`text-sm ${i < 4 ? 'text-gray-300' : 'text-gray-500'}`}>{step}</span>
+                        <span className={`text-sm ${i < 4 ? 'text-embee-slate/60' : 'text-embee-slate/70'}`}>{step}</span>
                       </div>
                     )
                   )}
@@ -425,7 +425,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center gap-2 border border-gray-200 text-embee-charcoal text-base font-semibold px-8 py-3.5 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center justify-center gap-2 border border-embee-slate/20 text-embee-charcoal text-base font-semibold px-8 py-3.5 rounded-lg hover:bg-embee-white transition-colors"
             >
               Sign In
             </Link>
@@ -440,7 +440,7 @@ export default function HomePage() {
             {/* Brand */}
             <div className="sm:col-span-2 lg:col-span-1">
               <Logo variant="wordmark" size="sm" theme="dark" href="/" />
-              <p className="mt-4 text-sm text-gray-400 max-w-xs leading-relaxed">
+              <p className="mt-4 text-sm text-embee-slate/50 max-w-xs leading-relaxed">
                 You want it delivered. Embee Nexus is the right platform for the job.
               </p>
             </div>
@@ -450,17 +450,17 @@ export default function HomePage() {
               <h4 className="text-sm font-semibold text-white mb-4">Platform</h4>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/signup" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link href="/signup" className="text-sm text-embee-slate/50 hover:text-white transition-colors">
                     Send a Package
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link href="/login" className="text-sm text-embee-slate/50 hover:text-white transition-colors">
                     Sign In
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link href="/dashboard" className="text-sm text-embee-slate/50 hover:text-white transition-colors">
                     Dashboard
                   </Link>
                 </li>
@@ -472,12 +472,12 @@ export default function HomePage() {
               <h4 className="text-sm font-semibold text-white mb-4">Riders</h4>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/rider/register" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link href="/rider/register" className="text-sm text-embee-slate/50 hover:text-white transition-colors">
                     Become a Rider
                   </Link>
                 </li>
                 <li>
-                  <Link href="/rider/dashboard" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link href="/rider/dashboard" className="text-sm text-embee-slate/50 hover:text-white transition-colors">
                     Rider Dashboard
                   </Link>
                 </li>
@@ -489,17 +489,17 @@ export default function HomePage() {
               <h4 className="text-sm font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-3">
                 <li>
-                  <span className="text-sm text-gray-400">Embee Nexus</span>
+                  <span className="text-sm text-embee-slate/50">Embee Nexus</span>
                 </li>
               </ul>
             </div>
           </div>
 
           <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-embee-slate/70">
               &copy; {new Date().getFullYear()} Embee Nexus. All rights reserved.
             </p>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-embee-slate/80">
               Modern logistics platform
             </p>
           </div>

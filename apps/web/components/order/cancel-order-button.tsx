@@ -66,7 +66,7 @@ export function CancelOrderButton({ orderId, onCancelled }: CancelOrderButtonPro
                 onChange={(e) => setReason(e.target.value)}
                 rows={2}
                 placeholder="Why are you cancelling?"
-                className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-embee-blue"
+                className="w-full px-3 py-2 border border-embee-slate/20 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-embee-blue"
               />
             </div>
 
@@ -85,7 +85,7 @@ export function CancelOrderButton({ orderId, onCancelled }: CancelOrderButtonPro
               <button
                 onClick={() => { setShowConfirm(false); setError(null); }}
                 disabled={loading}
-                className="flex-1 py-2 px-4 border border-gray-200 text-sm font-medium rounded-md text-embee-charcoal bg-white hover:bg-embee-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
+                className="flex-1 py-2 px-4 border border-embee-slate/20 text-sm font-medium rounded-md text-embee-charcoal bg-white hover:bg-embee-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
               >
                 Keep Order
               </button>

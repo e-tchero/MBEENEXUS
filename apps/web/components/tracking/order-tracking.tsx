@@ -34,6 +34,7 @@ interface OrderData {
   delivered_at: string | null;
   completed_at: string | null;
   assigned_rider_id: string | null;
+  route_geometry?: [number, number][] | null;
   rider?: {
     full_name: string;
     rating: number;
@@ -190,6 +191,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
           riderLng={riderLocation?.longitude}
           riderHeading={riderLocation?.heading}
           status={order.status}
+          routeGeometry={order.route_geometry}
         />
       )}
 

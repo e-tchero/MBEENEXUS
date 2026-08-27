@@ -224,11 +224,13 @@ export class StadiaMapsProvider implements MapsProvider {
     }
 
     const summary = data.trip.summary;
+    const shape = data.trip.legs[0]?.shape || '';
 
     return {
       distance_km: Math.round((summary.length || 0) * 10) / 10,
       duration_minutes: Math.ceil((summary.time || 0) / 60),
-      polyline: data.trip.legs[0]?.shape || '',
+      polyline: shape,
+      coordinates: shape ? decodeValhallaPolyline(shape) : undefined,
     };
   }
 
@@ -248,6 +250,49 @@ export class StadiaMapsProvider implements MapsProvider {
       postal_code: (props.postalcode as string) || undefined,
     };
   }
+}
+
+/**
+ * Decode a Valhalla-encoded polyline string into [lng, lat] coordinates.
+ * Valhalla uses a 1e-6 precision encoding similar to Google's but with
+ * a different sign/bits scheme.
+ *
+ * @see https://github.com/valhalla/valhalla/blob/master/valhalla/midgard/encodedpolyline.h
+ */
+function decodeValhallaPolyline(encoded: string): [number, number][] {
+  const coords: [number, number][] = [];
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+
+  while (index < encoded.length) {
+    // Decode latitude
+    let shift = 0;
+    let result = 0;
+    let byte: number;
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1;
+    lat += dlat;
+
+    // Decode longitude
+    shift = 0;
+    result = 0;
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1;
+    lng += dlng;
+
+    coords.push([lng / 1e6, lat / 1e6]);
+  }
+
+  return coords;
 }
 
 /**

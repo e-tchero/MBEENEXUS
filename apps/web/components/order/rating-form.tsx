@@ -94,7 +94,7 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
           {[1, 2, 3, 4, 5].map((star) => (
             <span
               key={star}
-              className={`text-lg ${star <= existingRating.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+              className={`text-lg ${star <= existingRating.rating ? 'text-yellow-400' : 'text-embee-slate/40'}`}
             >
               ★
             </span>
@@ -144,7 +144,7 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
             <span className={
               star <= (hoveredRating || selectedRating)
                 ? 'text-yellow-400'
-                : 'text-gray-200'
+                : 'text-embee-slate/30'
             }>
               ★
             </span>
@@ -169,7 +169,7 @@ export function RatingForm({ orderId, visible, onRatingSubmitted }: RatingFormPr
           rows={2}
           maxLength={500}
           placeholder="Add a comment (optional)"
-          className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-embee-blue"
+          className="w-full px-3 py-2 border border-embee-slate/20 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-embee-blue"
         />
         <p className="text-xs text-embee-slate mt-1">{comment.length}/500</p>
       </div>

@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   // Order statuses
-  draft: { label: 'Draft', className: 'bg-gray-100 text-gray-800' },
+  draft: { label: 'Draft', className: 'bg-embee-slate/10 text-embee-charcoal' },
   pending_payment: { label: 'Pending Payment', className: 'bg-yellow-100 text-yellow-800' },
   paid: { label: 'Paid', className: 'bg-green-100 text-green-800' },
   searching_rider: { label: 'Finding Rider', className: 'bg-blue-100 text-blue-800' },
@@ -16,7 +16,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   completed: { label: 'Completed', className: 'bg-green-100 text-green-800' },
   cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-800' },
   failed: { label: 'Failed', className: 'bg-red-100 text-red-800' },
-  expired: { label: 'Expired', className: 'bg-gray-100 text-gray-800' },
+  expired: { label: 'Expired', className: 'bg-embee-slate/10 text-embee-charcoal' },
   disputed: { label: 'Disputed', className: 'bg-orange-100 text-orange-800' },
   refunded: { label: 'Refunded', className: 'bg-yellow-100 text-yellow-800' },
   // Rider assignment statuses
@@ -39,7 +39,7 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const config = STATUS_CONFIG[status] || {
     label: status.replace(/_/g, ' '),
-    className: 'bg-gray-100 text-gray-800',
+    className: 'bg-embee-slate/10 text-embee-charcoal',
   };
 
   return (
