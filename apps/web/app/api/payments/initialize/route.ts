@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { paymentService } from '@/lib/services/payment.service';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 const InitializePaymentSchema = z.object({
   order_id: z.string().uuid(),
@@ -18,6 +20,15 @@ export async function POST(request: NextRequest) {
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limit: payment tier (authenticated)
+    const rateLimit = checkRateLimit(`user:${user.id}`, 'payment');
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.retryAfterMs / 1000)) } }
+      );
     }
 
     const body = await request.json();
@@ -48,7 +59,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 502 });
       }
     }
-    console.error('Error initializing payment:', error);
+    logger.error('Error initializing payment', undefined, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to initialize payment' },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppNav } from '@/components/shared/app-nav';
+import { ErrorBoundary } from '@/components/shared/error-boundary';
 
 const RIDER_LINKS = [
   { label: 'Dashboard', href: '/rider/dashboard' },
@@ -38,7 +39,11 @@ export default async function RiderLayout({
         links={RIDER_LINKS}
         user={{ name: riderProfile.full_name || 'Rider' }}
       />
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{children}</main>
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <ErrorBoundary context="rider-dashboard">
+          {children}
+        </ErrorBoundary>
+      </main>
     </div>
   );
 }

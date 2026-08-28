@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { checkRateLimit, getRateLimitIdentity } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 const SignupSchema = z.object({
   email: z.string().email(),
@@ -9,6 +11,16 @@ const SignupSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limit: auth tier
+  const identity = getRateLimitIdentity(undefined, request.headers.get('x-forwarded-for'), null);
+  const rateLimit = checkRateLimit(identity, 'auth');
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.retryAfterMs / 1000)) } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { email, password, fullName } = SignupSchema.parse(body);
@@ -49,7 +61,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('Signup error:', error);
+    logger.error('Signup error', undefined, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

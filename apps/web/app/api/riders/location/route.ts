@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderLocationService } from '@/lib/services/rider-location.service';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 const UpdateLocationSchema = z.object({
   latitude: z.number().min(-90).max(90),
@@ -29,6 +31,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Rate limit: GPS tier (authenticated rider)
+    const rateLimit = checkRateLimit(`user:${user.id}`, 'gps');
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.retryAfterMs / 1000)) } }
+      );
+    }
+
     const body = await request.json();
     const validatedData = UpdateLocationSchema.parse(body);
 
@@ -49,7 +60,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('Error updating rider location:', error);
+    logger.error('Error updating rider location', undefined, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to update location' },
       { status: 500 }
@@ -78,7 +89,7 @@ export async function GET() {
 
     return NextResponse.json({ data: location });
   } catch (error) {
-    console.error('Error getting rider location:', error);
+    logger.error('Error getting rider location', undefined, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to get location' },
       { status: 500 }

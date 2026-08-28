@@ -402,6 +402,205 @@ export class AdminService {
       reviewed_at: new Date().toISOString(),
     };
   }
+
+  // =============================================
+  // Order Management
+  // =============================================
+
+  /**
+   * List orders with filtering and pagination (admin only).
+   */
+  async listOrders(
+    adminUserId: string,
+    filters: {
+      status?: string[];
+      search?: string;
+      page?: number;
+      limit?: number;
+    } = {}
+  ): Promise<{
+    data: Array<Record<string, unknown>>;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      total_pages: number;
+    };
+  }> {
+    await this.verifyAdminAuth(adminUserId);
+
+    const { status, search, page = 1, limit = 20 } = filters;
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const safePage = Math.max(1, page);
+    const offset = (safePage - 1) * safeLimit;
+
+    const serviceRole = await createServiceRoleClient();
+
+    let query = serviceRole
+      .from('orders')
+      .select(
+        `
+        id,
+        order_number,
+        status,
+        total_amount,
+        currency,
+        distance_km,
+        tracking_code,
+        created_at,
+        updated_at,
+        customer_id,
+        assigned_rider_id,
+        pickup_latitude,
+        pickup_longitude,
+        destination_latitude,
+        destination_longitude
+      `,
+        { count: 'exact' }
+      );
+
+    // Filter by status
+    if (status && status.length > 0) {
+      query = query.in('status', status);
+    }
+
+    // Search by order number or tracking code
+    if (search) {
+      query = query.or(`order_number.ilike.%${search}%,tracking_code.ilike.%${search}%`);
+    }
+
+    // Paginate
+    query = query
+      .order('created_at', { ascending: false })
+      .range(offset, offset + safeLimit - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw new Error(`Failed to list orders: ${error.message}`);
+    }
+
+    return {
+      data: data || [],
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total: count || 0,
+        total_pages: Math.ceil((count || 0) / safeLimit),
+      },
+    };
+  }
+
+  /**
+   * Get order detail for admin view.
+   */
+  async getOrderDetail(
+    adminUserId: string,
+    orderId: string
+  ): Promise<Record<string, unknown> | null> {
+    await this.verifyAdminAuth(adminUserId);
+
+    const serviceRole = await createServiceRoleClient();
+
+    const { data: order, error } = await serviceRole
+      .from('orders')
+      .select(
+        `
+        id,
+        order_number,
+        status,
+        total_amount,
+        currency,
+        distance_km,
+        estimated_duration_minutes,
+        tracking_code,
+        pickup_latitude,
+        pickup_longitude,
+        destination_latitude,
+        destination_longitude,
+        pickup_contact_name,
+        pickup_contact_phone,
+        recipient_name,
+        recipient_phone,
+        package_description,
+        package_weight_kg,
+        urgency_level,
+        created_at,
+        updated_at,
+        paid_at,
+        rider_assigned_at,
+        delivered_at,
+        completed_at,
+        customer_id,
+        assigned_rider_id
+      `
+      )
+      .eq('id', orderId)
+      .single();
+
+    if (error || !order) {
+      return null;
+    }
+
+    // Get order events for timeline
+    const { data: events } = await serviceRole
+      .from('order_events')
+      .select('event_type, from_status, to_status, actor_type, created_at')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true });
+
+    // Get payment info
+    const { data: payment } = await serviceRole
+      .from('payments')
+      .select('status, amount, currency, payment_method, paystack_reference')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    return {
+      ...order,
+      events: events || [],
+      payment: payment || null,
+    };
+  }
+
+  /**
+   * Cancel an order (admin only).
+   * Uses the existing cancel_order() PostgreSQL function.
+   */
+  async cancelOrder(
+    adminUserId: string,
+    orderId: string,
+    reason?: string
+  ): Promise<{ success: boolean; message: string }> {
+    await this.verifyAdminAuth(adminUserId);
+
+    const serviceRole = await createServiceRoleClient();
+
+    // Use the existing cancel_order() function via service role
+    // The function derives authorization from auth.uid()
+    // For admin cancellation, we need to set the auth context
+    const { data, error } = await serviceRole.rpc('cancel_order', {
+      p_order_id: orderId,
+      p_actor_type: 'admin',
+      p_reason: reason || 'Admin cancellation',
+    });
+
+    if (error) {
+      throw new Error(`Cancel order failed: ${error.message}`);
+    }
+
+    if (!data || data.length === 0) {
+      return { success: false, message: 'No result from cancellation' };
+    }
+
+    const result = data[0];
+    return {
+      success: result.success,
+      message: result.message,
+    };
+  }
 }
 
 export const adminService = new AdminService();

@@ -9,8 +9,9 @@ interface AdminSidebarProps {
 }
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
-  { label: 'Riders', href: '/admin/riders', icon: '🏍️' },
+  { label: 'Dashboard', href: '/admin/dashboard' },
+  { label: 'Orders', href: '/admin/orders' },
+  { label: 'Riders', href: '/admin/riders' },
 ];
 
 export function AdminSidebar({ userName, userRole }: AdminSidebarProps) {
@@ -50,7 +51,6 @@ export function AdminSidebar({ userName, userRole }: AdminSidebarProps) {
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 {item.label}
               </Link>
             );

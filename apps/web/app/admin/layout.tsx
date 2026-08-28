@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
+import { ErrorBoundary } from '@/components/shared/error-boundary';
 
 export default async function AdminLayout({
   children,
@@ -36,7 +37,9 @@ export default async function AdminLayout({
       />
       <div className="lg:pl-64">
         <main className="p-6 lg:p-8">
-          {children}
+          <ErrorBoundary context="admin-dashboard">
+            {children}
+          </ErrorBoundary>
         </main>
       </div>
     </div>

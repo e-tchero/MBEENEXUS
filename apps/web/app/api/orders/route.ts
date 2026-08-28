@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { orderService } from '@/lib/services/order.service';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 const CreateOrderSchema = z.object({
   quote_id: z.string().uuid(),
@@ -29,6 +31,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Rate limit: order tier (authenticated)
+    const rateLimit = checkRateLimit(`user:${user.id}`, 'order');
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.retryAfterMs / 1000)) } }
+      );
+    }
+
     const body = await request.json();
     const validatedData = CreateOrderSchema.parse(body);
 
@@ -52,7 +63,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 404 });
       }
     }
-    console.error('Error creating order:', error);
+    logger.error('Error creating order', undefined, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to create order' },
       { status: 500 }
@@ -78,9 +89,10 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
 
     const result = await orderService.listOrders(user.id, { status, page, limit });
+
     return NextResponse.json({ data: result });
   } catch (error) {
-    console.error('Error listing orders:', error);
+    logger.error('Error listing orders', undefined, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to list orders' },
       { status: 500 }

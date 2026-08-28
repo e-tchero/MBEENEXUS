@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { quoteService } from '@/lib/services/quote.service';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 const QuoteRequestSchema = z.object({
   pickup_latitude: z.number().min(-90).max(90),
@@ -28,6 +30,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Rate limit: quote tier (authenticated)
+    const rateLimit = checkRateLimit(`user:${user.id}`, 'quote');
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.retryAfterMs / 1000)) } }
+      );
+    }
+
     const body = await request.json();
     const validatedData = QuoteRequestSchema.parse(body);
 
@@ -48,7 +59,7 @@ export async function POST(request: NextRequest) {
         );
       }
     }
-    console.error('Error generating quote:', error);
+    logger.error('Error generating quote', undefined, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to generate quote' },
       { status: 500 }
