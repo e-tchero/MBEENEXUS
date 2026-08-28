@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import type { JobType, JobStatus } from '@repo/shared/types';
 
 export interface JobHandler {
@@ -130,14 +131,14 @@ export async function processPendingJobs(): Promise<{
       if (handler) {
         await handler(job.payload);
       } else {
-        console.warn(`No handler registered for job type: ${job.job_type}`);
+        logger.warn('job.no_handler', { job_id: job.id, job_type: job.job_type });
       }
 
       // Mark as completed
       await completeJob(job.id);
       processed++;
     } catch (error) {
-      console.error(`Job ${job.id} (${job.job_type}) failed:`, error);
+      logger.error('job.failed', { job_id: job.id, job_type: job.job_type, attempt: job.attempts + 1 }, error instanceof Error ? error : undefined);
 
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       await failJob(job.id, errorMessage, job.attempts + 1, job.max_attempts);
@@ -174,7 +175,7 @@ export async function detectStaleRiders(): Promise<number> {
   });
 
   if (error) {
-    console.error('Failed to detect stale riders:', error);
+    logger.error('job.stale_rider_detection_failed', {}, error instanceof Error ? error : undefined);
     return 0;
   }
 
@@ -195,7 +196,7 @@ export async function recoverStuckJobs(
   });
 
   if (error) {
-    console.error('Failed to recover stuck jobs:', error);
+    logger.error('job.stuck_recovery_failed', {}, error instanceof Error ? error : undefined);
     return 0;
   }
 

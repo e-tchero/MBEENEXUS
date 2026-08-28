@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderOfferService } from '@/lib/services/rider-offer.service';
@@ -22,7 +23,7 @@ export async function GET() {
 
     return NextResponse.json({ data: assignment });
   } catch (error) {
-    console.error('Error fetching active assignment:', error);
+    logger.error('Error fetching active assignment', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to fetch active assignment' },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import type { Order, Payment } from '@repo/shared/types';
 
 export interface CreateOrderInput {
@@ -134,7 +135,7 @@ export class OrderService {
       .single();
 
     if (orderError) {
-      console.error('Order creation error:', orderError);
+      logger.error('order.creation_failed', { customer_id: customerId }, orderError instanceof Error ? orderError : undefined);
       throw new Error('Failed to create order');
     }
 
@@ -147,7 +148,7 @@ export class OrderService {
       .eq('id', input.quote_id);
 
     if (linkError) {
-      console.error('Quote linking error:', linkError);
+      logger.warn('order.quote_link_failed', { order_id: orderId, quote_id: input.quote_id, error: linkError instanceof Error ? linkError.message : String(linkError) });
       // Order is created, continue with payment
     }
 
@@ -189,7 +190,7 @@ export class OrderService {
       .single();
 
     if (paymentError) {
-      console.error('Payment creation error:', paymentError);
+      logger.error('order.payment_record_failed', { order_id: orderId }, paymentError instanceof Error ? paymentError : undefined);
       throw new Error('Failed to create payment record');
     }
 
@@ -203,7 +204,7 @@ export class OrderService {
     const { data, error } = await serviceRole.rpc('generate_order_number');
 
     if (error || !data) {
-      console.error('Failed to generate order number:', error);
+      logger.error('order.number_generation_failed', {}, error instanceof Error ? error : undefined);
       throw new Error('Failed to generate order number');
     }
 

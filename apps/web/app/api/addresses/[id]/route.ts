@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { addressService } from '@/lib/services/address.service';
@@ -39,7 +40,7 @@ export async function GET(
 
     return NextResponse.json({ data: address });
   } catch (error) {
-    console.error('Error getting address:', error);
+    logger.error('Error getting address', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to get address' },
       { status: 500 }
@@ -75,7 +76,7 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    console.error('Error updating address:', error);
+    logger.error('Error updating address', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to update address' },
       { status: 500 }
@@ -108,7 +109,7 @@ export async function DELETE(
         { status: 400 }
       );
     }
-    console.error('Error deleting address:', error);
+    logger.error('Error deleting address', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to delete address' },
       { status: 500 }

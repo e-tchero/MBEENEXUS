@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderService } from '@/lib/services/rider.service';
@@ -27,7 +28,7 @@ export async function GET() {
     const vehicles = await riderService.listVehicles(user.id);
     return NextResponse.json({ data: vehicles });
   } catch (error) {
-    console.error('Error listing vehicles:', error);
+    logger.error('Error listing vehicles', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to list vehicles' },
       { status: 500 }
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('Error creating vehicle:', error);
+    logger.error('Error creating vehicle', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to create vehicle' },
       { status: 500 }

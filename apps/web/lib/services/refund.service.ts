@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // Types
@@ -42,7 +43,7 @@ export class RefundService {
     const paystackTransactionId = payload.paystack_transaction_id as string | null;
     const paystackReference = payload.paystack_reference as string | null;
 
-    console.log(`[REFUND] Processing refund ${refundId} for order ${orderId}`);
+    logger.info('refund.processing', { refund_id: refundId, order_id: orderId });
 
     // Lock the refund row and check status (idempotency)
     const { data: refund, error: refundError } = await serviceRole
@@ -52,19 +53,19 @@ export class RefundService {
       .single();
 
     if (refundError || !refund) {
-      console.error(`[REFUND] Refund record not found: ${refundId}`);
+      logger.error('refund.record_not_found', { refund_id: refundId });
       throw new Error(`Refund record not found: ${refundId}`);
     }
 
     // Idempotency: already processed
     if (refund.status === 'success') {
-      console.log(`[REFUND] Refund ${refundId} already succeeded — skipping`);
+      logger.info('refund.already_succeeded', { refund_id: refundId });
       return;
     }
 
     // Idempotency: already failed permanently
     if (refund.status === 'failed') {
-      console.log(`[REFUND] Refund ${refundId} already failed — skipping`);
+      logger.info('refund.already_failed', { refund_id: refundId });
       return;
     }
 
@@ -83,7 +84,7 @@ export class RefundService {
     const transactionIdentifier = paystackTransactionId || paystackReference;
 
     if (!transactionIdentifier) {
-      console.error(`[REFUND] No Paystack transaction identifier for refund ${refundId}`);
+      logger.error('refund.no_transaction_id', { refund_id: refundId });
       await this.markRefundFailed(refundId, 'No Paystack transaction identifier available');
       return;
     }
@@ -144,15 +145,15 @@ export class RefundService {
           },
         });
 
-        console.log(`[REFUND] Refund ${refundId} submitted to Paystack successfully`);
+        logger.info('refund.submitted_to_paystack', { refund_id: refundId });
       } else {
         // Paystack rejected the refund
         await this.markRefundFailed(refundId, paystackResult.message || 'Paystack refund failed');
-        console.error(`[REFUND] Paystack refund failed: ${paystackResult.message}`);
+        logger.error('refund.paystack_failed', { refund_id: refundId, message: paystackResult.message });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`[REFUND] Paystack API error for refund ${refundId}:`, error);
+      logger.error('refund.paystack_api_error', { refund_id: refundId }, error instanceof Error ? error : undefined);
       await this.markRefundFailed(refundId, `Paystack API error: ${errorMessage}`);
       throw error; // Re-throw to trigger job retry
     }

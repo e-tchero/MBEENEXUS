@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
@@ -82,7 +83,7 @@ export async function POST(
     });
 
     if (error) {
-      console.error('Fail delivery error:', error);
+      logger.error('Fail delivery error', {}, error instanceof Error ? error : undefined);
       return NextResponse.json(
         { error: 'Failed to report delivery failure' },
         { status: 500 }
@@ -112,7 +113,7 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error('Error reporting delivery failure:', error);
+    logger.error('Error reporting delivery failure', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to report delivery failure' },
       { status: 500 }

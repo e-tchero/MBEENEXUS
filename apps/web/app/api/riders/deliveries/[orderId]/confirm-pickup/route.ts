@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { activeDeliveryService } from '@/lib/services/active-delivery.service';
@@ -43,7 +44,7 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error('Error confirming pickup:', error);
+    logger.error('Error confirming pickup', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to confirm pickup' },
       { status: 500 }

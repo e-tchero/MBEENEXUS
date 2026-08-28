@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { adminService } from '@/lib/services/admin.service';
@@ -51,7 +52,7 @@ export async function POST(
 
     return NextResponse.json({ data: result });
   } catch (error: any) {
-    console.error('Error verifying rider:', error);
+    logger.error('Error verifying rider', {}, error instanceof Error ? error : undefined);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

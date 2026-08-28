@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useState } from 'react';
 
@@ -45,7 +46,7 @@ export function VerifyActions({
       setNotes('');
       onActionComplete();
     } catch (error) {
-      console.error('Error verifying rider:', error);
+      logger.error('admin.rider_verify_failed', {}, error instanceof Error ? error : undefined);
       alert(error instanceof Error ? error.message : 'Failed to verify rider');
     } finally {
       setIsProcessing(false);

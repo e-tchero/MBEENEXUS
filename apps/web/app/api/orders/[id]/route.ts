@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { orderService } from '@/lib/services/order.service';
@@ -26,7 +27,7 @@ export async function GET(
 
     return NextResponse.json({ data: order });
   } catch (error) {
-    console.error('Error getting order:', error);
+    logger.error('Error getting order', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to get order' },
       { status: 500 }

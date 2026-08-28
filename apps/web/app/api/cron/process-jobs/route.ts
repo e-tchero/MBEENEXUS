@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { processPendingJobs, detectStaleRiders, recoverStuckJobs, registerJobHandler } from '@/lib/services/background-job.service';
 import { dispatchService } from '@/lib/services/dispatch.service';
 import { refundService } from '@/lib/services/refund.service';
+import { logger } from '@/lib/logger';
 
 // Register dispatch job handlers
 registerJobHandler('DISPATCH_ORDER', async (payload) => {
@@ -48,7 +50,15 @@ export async function GET(request: NextRequest) {
 
     // Fail closed: if CRON_SECRET is not configured, deny all access.
     // Do not allow unauthenticated cron invocations in production.
-    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    if (!cronSecret || !authHeader) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Timing-safe comparison to prevent timing attacks
+    const expectedHeader = `Bearer ${cronSecret}`;
+    const headerBuf = Buffer.from(authHeader);
+    const expectedBuf = Buffer.from(expectedHeader);
+    if (headerBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(headerBuf, expectedBuf)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -68,7 +78,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Cron job processing error:', error);
+    logger.error('cron.processing_failed', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Internal error' },
       { status: 500 }

@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useState } from 'react';
 
@@ -78,7 +79,7 @@ export function DocumentCard({ document, onActionComplete }: DocumentCardProps) 
       setRejectionReason('');
       onActionComplete();
     } catch (error) {
-      console.error('Error verifying document:', error);
+      logger.error('admin.document_verify_failed', {}, error instanceof Error ? error : undefined);
       alert(error instanceof Error ? error.message : 'Failed to verify document');
     } finally {
       setIsProcessing(false);

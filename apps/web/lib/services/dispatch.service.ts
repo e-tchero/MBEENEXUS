@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // Configuration (loaded from platform_settings)
@@ -70,7 +71,7 @@ export class DispatchService {
     const serviceRole = await createServiceRoleClient();
     const config = await getDispatchConfig();
 
-    console.log(`[DISPATCH] Processing dispatch for order ${orderId}`);
+    logger.info('dispatch.processing', { order_id: orderId });
 
     // Call the existing PostgreSQL dispatch function
     // dispatch_rider_v2() now reads radius/timeout from platform_settings
@@ -79,7 +80,7 @@ export class DispatchService {
     });
 
     if (error) {
-      console.error(`[DISPATCH] Error calling dispatch_rider_v2:`, error);
+      logger.error('dispatch.rider_v2_failed', { order_id: orderId }, error instanceof Error ? error : undefined);
       return { success: false, message: `Dispatch function error: ${error.message}` };
     }
 
@@ -90,7 +91,7 @@ export class DispatchService {
     const result = data[0];
 
     if (result.success) {
-      console.log(`[DISPATCH] Offer sent to rider ${result.rider_id} for order ${orderId}`);
+      logger.info('dispatch.offer_sent', { order_id: orderId, rider_id: result.rider_id });
 
       // Record order event
       await this.recordOrderEvent(orderId, 'dispatch_offer_created', null, 'rider_assigned', {
@@ -109,7 +110,7 @@ export class DispatchService {
     }
 
     // Dispatch failed — no riders found
-    console.log(`[DISPATCH] No riders found for order ${orderId}`);
+    logger.info('dispatch.no_riders_found', { order_id: orderId });
 
     await this.recordOrderEvent(orderId, 'dispatch_failed', 'searching_rider', 'failed', {
       radius_km: config.radiusKm,
@@ -151,7 +152,7 @@ export class DispatchService {
     const completedRetries = orderRetries.length;
 
     if (completedRetries >= config.maxRetryAttempts) {
-      console.log(`[DISPATCH] Retry exhausted for order ${orderId} after ${completedRetries} attempts`);
+      logger.warn('dispatch.retry_exhausted', { order_id: orderId, attempts: completedRetries, max_attempts: config.maxRetryAttempts });
 
       // Mark order as failed (with status guard to prevent race conditions)
       await serviceRole
@@ -168,7 +169,7 @@ export class DispatchService {
       return { success: false, message: `Retry exhausted after ${completedRetries} attempts` };
     }
 
-    console.log(`[DISPATCH] Retrying dispatch for order ${orderId} (attempt ${completedRetries + 1}/${config.maxRetryAttempts})`);
+    logger.info('dispatch.retrying', { order_id: orderId, attempt: completedRetries + 1, max_attempts: config.maxRetryAttempts });
 
     // Re-invoke dispatch
     const dispatchResult = await this.processDispatchJob(orderId);
@@ -210,7 +211,7 @@ export class DispatchService {
   }> {
     const serviceRole = await createServiceRoleClient();
 
-    console.log(`[DISPATCH] Processing offer timeout for order ${orderId}`);
+    logger.info('dispatch.offer_timeout_processing', { order_id: orderId });
 
     // Find expired offers for this order — use atomic update to prevent race conditions
     // Update status from 'offered' to 'expired' in a single operation
@@ -226,7 +227,7 @@ export class DispatchService {
       .select('id, rider_id');
 
     if (expireError) {
-      console.error(`[DISPATCH] Error expiring offers:`, expireError);
+      logger.error('dispatch.offer_expiry_failed', { order_id: orderId }, expireError instanceof Error ? expireError : undefined);
       return { expired: false, message: `Error expiring offers: ${expireError.message}` };
     }
 
@@ -241,7 +242,7 @@ export class DispatchService {
         .update({ is_available: true })
         .eq('rider_id', offer.rider_id);
 
-      console.log(`[DISPATCH] Expired offer ${offer.id} for rider ${offer.rider_id}`);
+      logger.info('dispatch.offer_expired', { order_id: orderId, assignment_id: offer.id, rider_id: offer.rider_id });
     }
 
     // Check if order is still searching AND no pending DISPATCH_RETRY already exists

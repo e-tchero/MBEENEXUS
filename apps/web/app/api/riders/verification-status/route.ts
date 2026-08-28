@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderService } from '@/lib/services/rider.service';
@@ -17,7 +18,7 @@ export async function GET() {
     const status = await riderService.getVerificationStatus(user.id);
     return NextResponse.json({ data: status });
   } catch (error) {
-    console.error('Error getting verification status:', error);
+    logger.error('Error getting verification status', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to get verification status' },
       { status: 500 }

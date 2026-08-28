@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -13,7 +14,7 @@ export async function GET() {
     if (error) throw error;
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error listing categories:', error);
+    logger.error('Error listing categories', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to list categories' },
       { status: 500 }

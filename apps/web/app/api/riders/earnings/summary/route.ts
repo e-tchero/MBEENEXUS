@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { earningsService } from '@/lib/services/earnings.service';
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('[EARNINGS] Error fetching earnings summary:', error);
+    logger.error('[EARNINGS] Error fetching earnings summary', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { z } from 'zod';
@@ -81,7 +82,7 @@ export async function PATCH(request: NextRequest) {
       );
 
     if (upsertError) {
-      console.error('Failed to update availability:', upsertError);
+      logger.error('rider.availability_update_failed', {}, upsertError instanceof Error ? upsertError : undefined);
       return NextResponse.json(
         { error: 'Failed to update availability' },
         { status: 500 }
@@ -98,7 +99,7 @@ export async function PATCH(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('Error updating availability:', error);
+    logger.error('Error updating availability', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to update availability' },
       { status: 500 }
@@ -137,7 +138,7 @@ export async function GET() {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error getting availability:', error);
+    logger.error('Error getting availability', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to get availability' },
       { status: 500 }

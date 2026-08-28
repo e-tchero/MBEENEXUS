@@ -1,4 +1,5 @@
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // Admin Verification Service
@@ -134,7 +135,7 @@ export class AdminService {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Failed to list riders:', error);
+      logger.error('admin.list_riders_failed', { admin_id: adminUserId }, error instanceof Error ? error : undefined);
       throw new Error('Failed to list riders');
     }
 
@@ -312,7 +313,7 @@ export class AdminService {
       .eq('id', riderId);
 
     if (updateError) {
-      console.error('Failed to update rider verification:', updateError);
+      logger.error('admin.rider_verification_update_failed', { rider_id: riderId, admin_id: adminUserId }, updateError instanceof Error ? updateError : undefined);
       throw new Error('Failed to update verification status');
     }
 
@@ -329,7 +330,7 @@ export class AdminService {
       });
 
     if (auditError) {
-      console.error('Failed to record audit trail:', auditError);
+      logger.warn('admin.audit_trail_failed', { rider_id: riderId, error: auditError instanceof Error ? auditError.message : String(auditError) });
       // Don't throw — the verification succeeded, audit is secondary
     }
 
@@ -390,7 +391,7 @@ export class AdminService {
       .eq('id', docId);
 
     if (updateError) {
-      console.error('Failed to update document:', updateError);
+      logger.error('admin.document_update_failed', { doc_id: docId, admin_id: adminUserId }, updateError instanceof Error ? updateError : undefined);
       throw new Error('Failed to update document status');
     }
 

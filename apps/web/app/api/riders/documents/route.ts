@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderService } from '@/lib/services/rider.service';
@@ -28,7 +29,7 @@ export async function GET() {
     const documents = await riderService.listDocuments(user.id);
     return NextResponse.json({ data: documents });
   } catch (error) {
-    console.error('Error listing documents:', error);
+    logger.error('Error listing documents', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to list documents' },
       { status: 500 }
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 409 });
       }
     }
-    console.error('Error submitting document:', error);
+    logger.error('Error submitting document', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to submit document' },
       { status: 500 }

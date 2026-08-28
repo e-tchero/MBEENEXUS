@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { activeDeliveryService } from '@/lib/services/active-delivery.service';
@@ -33,7 +34,7 @@ export async function GET(
 
     return NextResponse.json({ data: delivery });
   } catch (error) {
-    console.error('Error fetching delivery details:', error);
+    logger.error('Error fetching delivery details', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to fetch delivery details' },
       { status: 500 }

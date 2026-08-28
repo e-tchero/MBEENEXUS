@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderService } from '@/lib/services/rider.service';
@@ -26,7 +27,7 @@ export async function GET() {
 
     return NextResponse.json({ data: profile });
   } catch (error) {
-    console.error('Error getting rider profile:', error);
+    logger.error('Error getting rider profile', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to get rider profile' },
       { status: 500 }
@@ -63,7 +64,7 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 400 });
       }
     }
-    console.error('Error updating rider profile:', error);
+    logger.error('Error updating rider profile', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to update rider profile' },
       { status: 500 }

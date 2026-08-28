@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderOfferService } from '@/lib/services/rider-offer.service';
@@ -47,7 +48,7 @@ export async function POST(
         { status: 400 }
       );
     }
-    console.error('Error rejecting offer:', error);
+    logger.error('Error rejecting offer', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to reject offer' },
       { status: 500 }

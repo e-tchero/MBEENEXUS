@@ -1,4 +1,5 @@
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // Types
@@ -105,7 +106,7 @@ export class RiderOfferService {
       .order('offered_at', { ascending: false });
 
     if (error) {
-      console.error('Failed to fetch offers:', error);
+      logger.error('offer.fetch_failed', { rider_id: riderId }, error instanceof Error ? error : undefined);
       throw error;
     }
 
@@ -225,7 +226,7 @@ export class RiderOfferService {
   }> {
     const serviceRole = await createServiceRoleClient();
 
-    console.log(`[OFFER] Rider ${riderId} accepting offer ${assignmentId}`);
+    logger.info('offer.accepting', { rider_id: riderId, assignment_id: assignmentId });
 
     const { data, error } = await serviceRole.rpc('accept_rider_offer', {
       p_assignment_id: assignmentId,
@@ -233,7 +234,7 @@ export class RiderOfferService {
     });
 
     if (error) {
-      console.error(`[OFFER] Error accepting offer:`, error);
+      logger.error('offer.accept_failed', { rider_id: riderId, assignment_id: assignmentId }, error instanceof Error ? error : undefined);
       return { success: false, message: `Failed to accept offer: ${error.message}` };
     }
 
@@ -244,7 +245,7 @@ export class RiderOfferService {
     const result = data[0];
 
     if (result.success) {
-      console.log(`[OFFER] Rider ${riderId} accepted offer ${assignmentId}`);
+      logger.info('offer.accepted', { rider_id: riderId, assignment_id: assignmentId });
 
       // Record order event
       await serviceRole.from('order_events').insert({
@@ -257,7 +258,7 @@ export class RiderOfferService {
         metadata: { assignment_id: assignmentId },
       });
     } else {
-      console.log(`[OFFER] Rider ${riderId} failed to accept: ${result.message}`);
+      logger.warn('offer.accept_rejected', { rider_id: riderId, assignment_id: assignmentId, message: result.message });
     }
 
     return { success: result.success, message: result.message };
@@ -277,7 +278,7 @@ export class RiderOfferService {
   }> {
     const serviceRole = await createServiceRoleClient();
 
-    console.log(`[OFFER] Rider ${riderId} rejecting offer ${assignmentId}`);
+    logger.info('offer.rejecting', { rider_id: riderId, assignment_id: assignmentId });
 
     const { data, error } = await serviceRole.rpc('reject_rider_offer', {
       p_assignment_id: assignmentId,
@@ -286,7 +287,7 @@ export class RiderOfferService {
     });
 
     if (error) {
-      console.error(`[OFFER] Error rejecting offer:`, error);
+      logger.error('offer.reject_failed', { rider_id: riderId, assignment_id: assignmentId }, error instanceof Error ? error : undefined);
       return { success: false, message: `Failed to reject offer: ${error.message}` };
     }
 
@@ -297,7 +298,7 @@ export class RiderOfferService {
     const result = data[0];
 
     if (result.success) {
-      console.log(`[OFFER] Rider ${riderId} rejected offer ${assignmentId}`);
+      logger.info('offer.rejected', { rider_id: riderId, assignment_id: assignmentId });
 
       // Record order event
       const orderId = await this.getAssignmentOrderId(assignmentId);

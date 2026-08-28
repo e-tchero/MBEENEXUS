@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
@@ -113,7 +114,7 @@ export async function POST(
           { status: 409 }
         );
       }
-      console.error('[RATING] Insert error:', insertError);
+      logger.error('rating.insert_failed', {}, insertError instanceof Error ? insertError : undefined);
       return NextResponse.json({ error: 'Failed to submit rating' }, { status: 500 });
     }
 
@@ -125,7 +126,7 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error('[RATING] Error:', error);
+    logger.error('[RATING] Error', {}, error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -177,7 +178,7 @@ export async function GET(
 
     return NextResponse.json({ data: rating });
   } catch (error) {
-    console.error('[RATING] Error fetching rating:', error);
+    logger.error('[RATING] Error fetching rating', {}, error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

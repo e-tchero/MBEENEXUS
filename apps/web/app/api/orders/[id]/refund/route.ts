@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { refundService } from '@/lib/services/refund.service';
@@ -46,7 +47,7 @@ export async function GET(
 
     return NextResponse.json({ data: refund });
   } catch (error) {
-    console.error('Error fetching refund status:', error);
+    logger.error('Error fetching refund status', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to fetch refund status' },
       { status: 500 }

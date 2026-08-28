@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { addressService } from '@/lib/services/address.service';
@@ -30,7 +31,7 @@ export async function GET() {
     const addresses = await addressService.list(user.id);
     return NextResponse.json({ data: addresses });
   } catch (error) {
-    console.error('Error listing addresses:', error);
+    logger.error('Error listing addresses', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to list addresses' },
       { status: 500 }
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error('Error creating address:', error);
+    logger.error('Error creating address', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to create address' },
       { status: 500 }

@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useState } from 'react';
 import type { Address } from '@repo/shared/types';
@@ -18,7 +19,7 @@ export function AddressList({ addresses }: AddressListProps) {
       });
       window.location.reload();
     } catch (error) {
-      console.error('Error setting default:', error);
+      logger.error('address.set_default_failed', {}, error instanceof Error ? error : undefined);
     } finally {
       setLoading(null);
     }
@@ -40,7 +41,7 @@ export function AddressList({ addresses }: AddressListProps) {
         alert(data.error || 'Failed to delete address');
       }
     } catch (error) {
-      console.error('Error deleting address:', error);
+      logger.error('address.delete_failed', {}, error instanceof Error ? error : undefined);
     } finally {
       setLoading(null);
     }

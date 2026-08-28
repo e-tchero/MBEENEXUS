@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { activeDeliveryService } from '@/lib/services/active-delivery.service';
@@ -88,7 +89,7 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error('Error completing delivery:', error);
+    logger.error('Error completing delivery', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to complete delivery' },
       { status: 500 }

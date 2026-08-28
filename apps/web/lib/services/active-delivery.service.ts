@@ -1,4 +1,5 @@
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // Types
@@ -143,7 +144,7 @@ export class ActiveDeliveryService {
   ): Promise<TransitionResult> {
     const serviceRole = await createServiceRoleClient();
 
-    console.log(`[DELIVERY] Transitioning order ${orderId} to ${targetStatus} by ${actorType}`);
+    logger.info('delivery.transitioning', { order_id: orderId, target_status: targetStatus, actor_type: actorType });
 
     const { data, error } = await serviceRole.rpc('transition_order_status', {
       p_order_id: orderId,
@@ -153,7 +154,7 @@ export class ActiveDeliveryService {
     });
 
     if (error) {
-      console.error(`[DELIVERY] Transition error:`, error);
+      logger.error('delivery.transition_failed', { order_id: orderId, target_status: targetStatus }, error instanceof Error ? error : undefined);
       return { success: false, message: `Transition failed: ${error.message}` };
     }
 
@@ -162,7 +163,7 @@ export class ActiveDeliveryService {
     }
 
     const result = data[0];
-    console.log(`[DELIVERY] Transition result: ${result.message}`);
+    logger.info('delivery.transition_result', { order_id: orderId, success: result.success, message: result.message });
 
     return {
       success: result.success,
@@ -185,7 +186,7 @@ export class ActiveDeliveryService {
   ): Promise<CompleteDeliveryResult> {
     const serviceRole = await createServiceRoleClient();
 
-    console.log(`[DELIVERY] Completing delivery for order ${orderId}`);
+    logger.info('delivery.completing', { order_id: orderId });
 
     const { data, error } = await serviceRole.rpc('complete_delivery', {
       p_order_id: orderId,
@@ -198,7 +199,7 @@ export class ActiveDeliveryService {
     });
 
     if (error) {
-      console.error(`[DELIVERY] Complete delivery error:`, error);
+      logger.error('delivery.complete_failed', { order_id: orderId }, error instanceof Error ? error : undefined);
       return { success: false, message: `Complete delivery failed: ${error.message}` };
     }
 
@@ -207,7 +208,7 @@ export class ActiveDeliveryService {
     }
 
     const result = data[0];
-    console.log(`[DELIVERY] Complete delivery result: ${result.message}`);
+    logger.info('delivery.complete_result', { order_id: orderId, success: result.success });
 
     return {
       success: result.success,
@@ -226,7 +227,7 @@ export class ActiveDeliveryService {
   ): Promise<TransitionResult> {
     const serviceRole = await createServiceRoleClient();
 
-    console.log(`[DELIVERY] Cancelling order ${orderId} by ${actorType}`);
+    logger.info('delivery.cancelling', { order_id: orderId, actor_type: actorType });
 
     const { data, error } = await serviceRole.rpc('cancel_order', {
       p_order_id: orderId,
@@ -235,7 +236,7 @@ export class ActiveDeliveryService {
     });
 
     if (error) {
-      console.error(`[DELIVERY] Cancel error:`, error);
+      logger.error('delivery.cancel_failed', { order_id: orderId }, error instanceof Error ? error : undefined);
       return { success: false, message: `Cancel failed: ${error.message}` };
     }
 
@@ -244,7 +245,7 @@ export class ActiveDeliveryService {
     }
 
     const result = data[0];
-    console.log(`[DELIVERY] Cancel result: ${result.message}`);
+    logger.info('delivery.cancel_result', { order_id: orderId, success: result.success });
 
     return {
       success: result.success,

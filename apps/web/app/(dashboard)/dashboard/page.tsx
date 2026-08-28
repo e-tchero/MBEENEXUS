@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -45,7 +46,7 @@ export default function DashboardPage() {
           setCategories(catData.data || []);
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        logger.error('dashboard.data_load_failed', {}, error instanceof Error ? error : undefined);
       } finally {
         setLoading(false);
       }
@@ -99,7 +100,7 @@ export default function DashboardPage() {
         }
       }
     } catch (error) {
-      console.error('Error creating order:', error);
+      logger.error('dashboard.order_create_failed', {}, error instanceof Error ? error : undefined);
     }
   };
 

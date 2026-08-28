@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { adminService } from '@/lib/services/admin.service';
@@ -27,7 +28,7 @@ export async function GET(
 
     return NextResponse.json({ data: rider });
   } catch (error: any) {
-    console.error('Error getting rider detail:', error);
+    logger.error('Error getting rider detail', {}, error instanceof Error ? error : undefined);
 
     if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

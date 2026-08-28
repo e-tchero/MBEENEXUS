@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
@@ -48,7 +49,7 @@ export async function POST(
     });
 
     if (error) {
-      console.error('Cancel order error:', error);
+      logger.error('Cancel order error', {}, error instanceof Error ? error : undefined);
       return NextResponse.json(
         { error: 'Failed to cancel order' },
         { status: 500 }
@@ -79,7 +80,7 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error('Error cancelling order:', error);
+    logger.error('Error cancelling order', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to cancel order' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { riderOfferService } from '@/lib/services/rider-offer.service';
@@ -30,7 +31,7 @@ export async function GET(
 
     return NextResponse.json({ data: offer });
   } catch (error) {
-    console.error('Error fetching offer details:', error);
+    logger.error('Error fetching offer details', {}, error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: 'Failed to fetch offer details' },
       { status: 500 }

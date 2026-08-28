@@ -1,4 +1,5 @@
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import type { RiderProfile, Vehicle, VehicleType } from '@repo/shared/types';
 
 // =============================================
@@ -37,7 +38,7 @@ export class RiderService {
       .eq('id', userId);
 
     if (profileError) {
-      console.error('Failed to update profile:', profileError);
+      logger.error('rider.profile_update_failed', { rider_id: userId }, profileError instanceof Error ? profileError : undefined);
       throw new Error('Failed to update profile');
     }
 
@@ -53,7 +54,7 @@ export class RiderService {
       .single();
 
     if (riderError) {
-      console.error('Failed to create rider profile:', riderError);
+      logger.error('rider.profile_create_failed', { rider_id: userId }, riderError instanceof Error ? riderError : undefined);
       throw new Error('Failed to create rider profile');
     }
 
@@ -72,7 +73,7 @@ export class RiderService {
       .single();
 
     if (vehicleError) {
-      console.error('Failed to create vehicle:', vehicleError);
+      logger.error('rider.vehicle_create_failed', { rider_id: userId }, vehicleError instanceof Error ? vehicleError : undefined);
       throw new Error('Failed to create vehicle');
     }
 
@@ -139,7 +140,7 @@ export class RiderService {
       .single();
 
     if (error) {
-      console.error('Failed to update rider profile:', error);
+      logger.error('rider.profile_update_failed', { rider_id: userId }, error instanceof Error ? error : undefined);
       throw error;
     }
     return data;
@@ -186,7 +187,7 @@ export class RiderService {
       .single();
 
     if (error) {
-      console.error('Failed to create vehicle:', error);
+      logger.error('rider.vehicle_create_failed', { rider_id: userId }, error instanceof Error ? error : undefined);
       throw error;
     }
     return data;
@@ -215,7 +216,7 @@ export class RiderService {
       .single();
 
     if (error) {
-      console.error('Failed to update vehicle:', error);
+      logger.error('rider.vehicle_update_failed', { rider_id: userId, vehicle_id: vehicleId }, error instanceof Error ? error : undefined);
       throw error;
     }
     return data;
@@ -279,7 +280,7 @@ export class RiderService {
       .single();
 
     if (error) {
-      console.error('Failed to submit document:', error);
+      logger.error('rider.document_submit_failed', { rider_id: userId }, error instanceof Error ? error : undefined);
       throw error;
     }
 

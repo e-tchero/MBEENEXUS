@@ -1,4 +1,5 @@
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // Configuration (loaded from platform_settings)
@@ -157,7 +158,7 @@ export class RiderLocationService {
       });
 
     if (insertError) {
-      console.error('Failed to insert rider location:', insertError);
+      logger.error('rider.location_insert_failed', { rider_id: riderId }, insertError instanceof Error ? insertError : undefined);
       return { accepted: false, reason: 'Database write failed', wroteHistorical: false, broadcast: false };
     }
 

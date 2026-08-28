@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
@@ -67,7 +68,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('[PROOF] Error:', error);
+    logger.error('[PROOF] Error', {}, error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
