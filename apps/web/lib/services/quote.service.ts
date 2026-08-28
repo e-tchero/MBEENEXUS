@@ -3,19 +3,6 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getMapsProvider } from '@/lib/maps';
 import type { DeliveryQuote, PricingRule } from '@repo/shared/types';
 
-/** Haversine distance in km — fallback when Maps provider is unavailable */
-function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
 export interface QuoteRequest {
   pickup_latitude: number;
   pickup_longitude: number;
@@ -54,22 +41,14 @@ export class QuoteService {
   ): Promise<DeliveryQuote> {
     const supabase = await createClient();
 
-    // 1. Get route distance and duration
-    let route: { distance_km: number; duration_minutes: number };
-    try {
-      const maps = getMapsProvider();
-      route = await maps.getRoute(
-        { lat: request.pickup_latitude, lon: request.pickup_longitude },
-        { lat: request.destination_latitude, lon: request.destination_longitude }
-      );
-    } catch {
-      // Fallback: Haversine straight-line distance (no Maps API key)
-      const distanceKm = haversineDistance(
-        request.pickup_latitude, request.pickup_longitude,
-        request.destination_latitude, request.destination_longitude
-      );
-      route = { distance_km: Math.round(distanceKm * 10) / 10, duration_minutes: Math.round(distanceKm * 3) };
-    }
+    // 1. Calculate route (ONE routing call per quote/order lifecycle)
+    // Route result includes distance, duration, and geometry.
+    // OrderService will reuse this geometry — no second routing call.
+    const maps = getMapsProvider();
+    const route = await maps.getRoute(
+      { lat: request.pickup_latitude, lon: request.pickup_longitude },
+      { lat: request.destination_latitude, lon: request.destination_longitude }
+    );
 
     // 2. Determine zones for pickup and destination
     const pickupZone = await this.findZone(request.pickup_latitude, request.pickup_longitude);
@@ -79,7 +58,9 @@ export class QuoteService {
     let calculation: QuoteCalculation;
 
     if (pickupZone && destinationZone && pickupZone.zone_id !== destinationZone.zone_id) {
-      // CROSS-ZONE: fixed price from zone pricing matrix
+      // CROSS-ZONE: route-distance-based pricing (unified with same-zone model)
+      // Uses the same distance-based formula as same-zone pricing.
+      // Fixed-price zone_pricing_matrix lookup is no longer authoritative.
       calculation = await this.calculateCrossZonePricing(
         pickupZone.zone_id,
         pickupZone.zone_name,
@@ -87,6 +68,7 @@ export class QuoteService {
         destinationZone.zone_name,
         route.distance_km,
         route.duration_minutes,
+        request.weight_kg,
         request.urgency_level || 'standard'
       );
     } else if (pickupZone) {
@@ -136,6 +118,7 @@ export class QuoteService {
         distance_km: calculation.distance_km,
         estimated_duration_minutes: calculation.estimated_duration_minutes,
         valid_until: new Date(Date.now() + quoteLifetime * 1000).toISOString(),
+        route_geometry: route.coordinates ? JSON.parse(JSON.stringify(route.coordinates)) : null,
       })
       .select()
       .single();
@@ -247,8 +230,9 @@ export class QuoteService {
   }
 
   /**
-   * Cross-zone pricing: fixed price from zone_pricing_matrix
-   * Symmetrical: A→B = B→A
+   * Cross-zone pricing: distance-based (unified with same-zone model).
+   * Uses the route-authoritative distance × per-km rate from the origin zone's pricing rule.
+   * No fixed-price lookup. Consistent with the founder's route-based pricing direction.
    */
   private async calculateCrossZonePricing(
     originZoneId: string,
@@ -257,64 +241,41 @@ export class QuoteService {
     destinationZoneName: string,
     distanceKm: number,
     durationMinutes: number,
+    weightKg: number | undefined,
     urgencyLevel: 'standard' | 'express' | 'urgent'
   ): Promise<QuoteCalculation> {
-    const serviceRole = await createServiceRoleClient();
-
-    // Look up cross-zone price (try both directions for symmetrical pricing)
-    let { data: matrix } = await serviceRole
-      .from('zone_pricing_matrix')
-      .select('*')
-      .eq('origin_zone_id', originZoneId)
-      .eq('destination_zone_id', destinationZoneId)
-      .eq('is_active', true)
-      .lte('valid_from', new Date().toISOString())
-      .or(`valid_to.is.null,valid_to.gt.${new Date().toISOString()}`)
-      .order('version', { ascending: false })
-      .limit(1)
-      .single();
-
-    // If not found, try reverse direction (symmetrical)
-    if (!matrix) {
-      const { data: reverseMatrix } = await serviceRole
-        .from('zone_pricing_matrix')
-        .select('*')
-        .eq('origin_zone_id', destinationZoneId)
-        .eq('destination_zone_id', originZoneId)
-        .eq('is_active', true)
-        .lte('valid_from', new Date().toISOString())
-        .or(`valid_to.is.null,valid_to.gt.${new Date().toISOString()}`)
-        .order('version', { ascending: false })
-        .limit(1)
-        .single();
-
-      matrix = reverseMatrix;
+    // Use the origin zone's pricing rule for distance-based calculation.
+    // This ensures consistent pricing regardless of zone crossing direction.
+    const pricingRule = await this.findPricingRule(originZoneId);
+    if (!pricingRule) {
+      throw new Error('No pricing rule available for this route');
     }
 
-    if (!matrix) {
-      throw new Error('No cross-zone pricing available for this route');
+    // Apply the same distance-based formula as same-zone pricing
+    const distanceFee = distanceKm * pricingRule.per_kilometer;
+    const deliveryFare = Math.max(distanceFee, pricingRule.minimum_fare);
+
+    let weightMultiplier = 1.0;
+    if (weightKg && pricingRule.weight_bands) {
+      for (const band of pricingRule.weight_bands) {
+        if (weightKg >= band.min_kg && weightKg < band.max_kg) {
+          weightMultiplier = band.multiplier;
+          break;
+        }
+      }
     }
+    const weightFee = deliveryFare * (weightMultiplier - 1);
 
-    const fixedPrice = Number(matrix.fixed_price);
-
-    // Priority fee
     const priorityFee = await this.getPriorityFee(urgencyLevel);
-
-    // Subtotal
-    const subtotal = fixedPrice + priorityFee;
-
-    // Tax: use default VAT rate from platform settings (or fallback 7.5%)
-    const taxRate = await this.getTaxRate();
-    const taxAmount = subtotal * taxRate;
-
-    // Total
+    const subtotal = deliveryFare + weightFee + priorityFee;
+    const taxAmount = subtotal * pricingRule.tax_rate;
     const totalAmount = Math.round((subtotal + taxAmount) * 100) / 100;
 
     return {
-      pricing_rule_id: matrix.id,
-      base_fee: fixedPrice,
-      distance_fee: 0, // Cross-zone is a fixed price
-      weight_fee: 0,
+      pricing_rule_id: pricingRule.id,
+      base_fee: pricingRule.minimum_fare,
+      distance_fee: Math.round(distanceFee * 100) / 100,
+      weight_fee: Math.round(weightFee * 100) / 100,
       priority_fee: priorityFee,
       subtotal_before_discount: subtotal,
       discount_amount: 0,
@@ -322,7 +283,7 @@ export class QuoteService {
       tax_amount: Math.round(taxAmount * 100) / 100,
       total_amount: totalAmount,
       distance_km: Math.round(distanceKm * 100) / 100,
-      estimated_duration_minutes: matrix.estimated_duration_minutes || durationMinutes,
+      estimated_duration_minutes: durationMinutes,
       currency: 'NGN',
       pricing_type: 'cross_zone',
       zone_name: `${originZoneName} → ${destinationZoneName}`,

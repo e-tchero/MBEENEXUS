@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { getMapsProvider } from '@/lib/maps';
 import type { Order, Payment } from '@repo/shared/types';
 
 export interface CreateOrderInput {
@@ -29,24 +28,24 @@ export class OrderService {
   ): Promise<OrderCreationResult> {
     const serviceRole = await createServiceRoleClient();
 
-    // 1. Get and validate quote
+    // 1. Atomically consume quote (prevents race condition / duplicate orders)
+    const now = new Date().toISOString();
     const { data: quote, error: quoteError } = await serviceRole
       .from('delivery_quotes')
-      .select('*')
+      .update({
+        is_consumed: true,
+        consumed_at: now,
+      })
       .eq('id', input.quote_id)
       .eq('customer_id', customerId)
+      .eq('is_consumed', false)
+      .gte('valid_until', now)
+      .select()
       .single();
 
     if (quoteError || !quote) {
-      throw new Error('Quote not found');
-    }
-
-    if (quote.is_consumed) {
-      throw new Error('Quote already consumed');
-    }
-
-    if (new Date(quote.valid_until) < new Date()) {
-      throw new Error('Quote expired');
+      // Quote not found, already consumed, or expired
+      throw new Error('Quote not found, already consumed, or expired');
     }
 
     // 2. Get addresses to validate ownership
@@ -72,31 +71,21 @@ export class OrderService {
       throw new Error('Destination address not found');
     }
 
-    // 3. Generate identifiers
+    // 2. Generate identifiers
     const orderNumber = await this.generateOrderNumber(serviceRole);
     const trackingCode = await this.generateTrackingCode(serviceRole);
     const paymentReference = `MBEENEXUS-${orderNumber}-${Date.now()}`;
 
-    // 4. Get tax snapshot from pricing rule
+    // 3. Get tax snapshot from pricing rule
     const { data: pricingRule } = await serviceRole
       .from('pricing_rules')
       .select('tax_rate, tax_name')
       .eq('id', quote.pricing_rule_id)
       .single();
 
-    // 5. Calculate route geometry (one-time, stored on order for TrackingMap)
-    let routeGeometry: [number, number][] | null = null;
-    try {
-      const maps = getMapsProvider();
-      const route = await maps.getRoute(
-        { lat: quote.pickup_latitude, lon: quote.pickup_longitude },
-        { lat: quote.destination_latitude, lon: quote.destination_longitude }
-      );
-      routeGeometry = route.coordinates || null;
-    } catch {
-      // Route geometry is optional — tracking map falls back to straight line
-      console.warn('Failed to calculate route geometry for order');
-    }
+    // 4. Route geometry is reused from quote — NO additional routing call.
+    // The route was calculated once during quote generation and stored on the quote.
+    const routeGeometry = quote.route_geometry as [number, number][] | null;
 
     // 6. Create order
     const orderId = crypto.randomUUID();
@@ -149,22 +138,20 @@ export class OrderService {
       throw new Error('Failed to create order');
     }
 
-    // 7. Mark quote as consumed
-    const { error: consumeError } = await serviceRole
+    // 6. Link quote to order (consumption already done atomically in step 1)
+    const { error: linkError } = await serviceRole
       .from('delivery_quotes')
       .update({
-        is_consumed: true,
-        consumed_at: new Date().toISOString(),
         order_id: orderId,
       })
       .eq('id', input.quote_id);
 
-    if (consumeError) {
-      console.error('Quote consumption error:', consumeError);
+    if (linkError) {
+      console.error('Quote linking error:', linkError);
       // Order is created, continue with payment
     }
 
-    // 8. Create order event
+    // 7. Create order event
     await serviceRole.from('order_events').insert({
       order_id: orderId,
       event_type: 'order_created',
@@ -178,7 +165,7 @@ export class OrderService {
       },
     });
 
-    // 9. Create order status history
+    // 8. Create order status history
     await serviceRole.from('order_status_history').insert({
       order_id: orderId,
       status: 'pending_payment',
@@ -186,7 +173,7 @@ export class OrderService {
       created_by: customerId,
     });
 
-    // 10. Create payment record
+    // 9. Create payment record
     const { data: payment, error: paymentError } = await serviceRole
       .from('payments')
       .insert({
