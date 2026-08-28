@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin/dashboard' },
   { label: 'Orders', href: '/admin/orders' },
   { label: 'Riders', href: '/admin/riders' },
+  { label: 'Customers', href: '/admin/customers' },
 ];
 
 export function AdminSidebar({ userName, userRole }: AdminSidebarProps) {
