@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
 import { MobileNav } from './mobile-nav';
+import { NotificationBell } from '@/components/notifications';
 
 interface NavLink {
   label: string;
@@ -56,8 +57,9 @@ export function AppNav({ brand = 'customer', links, user, signOutAction = '/auth
               </div>
             </div>
 
-            {/* Right: User + sign out */}
+            {/* Right: Notifications + User + sign out */}
             <div className="hidden sm:flex sm:items-center sm:gap-4">
+              <NotificationBell />
               {user && (
                 <span className="text-sm text-embee-slate">{user.name}</span>
               )}
