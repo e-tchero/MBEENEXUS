@@ -49,6 +49,9 @@ pnpm-debug.log*
 # Vercel
 .vercel/
 
+# Agent tooling (UUPM)
+.agents/
+
 # TypeScript
 *.tsbuildinfo
 
