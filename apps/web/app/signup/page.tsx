@@ -59,9 +59,14 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-embee-white py-12 px-4">
         <div className="max-w-md w-full text-center">
-          <div className="p-6 bg-green-50 rounded-lg">
-            <h2 className="text-xl font-semibold text-green-800">Account created!</h2>
-            <p className="mt-2 text-green-700">Redirecting to login...</p>
+          <div className="bg-status-success/20 rounded-xl p-8 border border-status-success/30">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-status-success">
+              <svg className="h-6 w-6 text-status-success-foreground" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-embee-charcoal">Account created!</h2>
+            <p className="mt-2 text-sm text-embee-slate">Redirecting to login...</p>
           </div>
         </div>
       </div>
@@ -72,23 +77,23 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-embee-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link href="/" className="text-center block">
+          <Link href="/" className="text-center block" aria-label="Embee Nexus home">
             <Logo variant="wordmark" size="md" theme="light" href="/" />
           </Link>
-          <h2 className="mt-6 text-center text-2xl font-bold text-embee-charcoal">
+          <h1 className="mt-6 text-center text-2xl font-bold text-embee-charcoal">
             Create your account
-          </h2>
+          </h1>
           <p className="mt-2 text-center text-sm text-embee-slate">
             Already have an account?{' '}
-            <Link href="/login" className="font-medium text-embee-blue hover:text-embee-blue/80">
+            <Link href="/login" className="font-medium text-embee-blue hover:text-embee-blue/80 transition-colors">
               Sign in
             </Link>
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
           {error && (
-            <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
+            <div role="alert" className="p-3 bg-status-error/20 text-status-error-foreground rounded-lg text-sm border border-status-error/30">
               {error}
             </div>
           )}
@@ -106,7 +111,7 @@ export default function SignupPage() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2.5 border border-embee-slate/20 rounded-lg shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-2 focus:ring-embee-blue focus:border-embee-blue sm:text-sm transition-colors"
                 placeholder="John Doe"
               />
             </div>
@@ -123,7 +128,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2.5 border border-embee-slate/20 rounded-lg shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-2 focus:ring-embee-blue focus:border-embee-blue sm:text-sm transition-colors"
                 placeholder="you@example.com"
               />
             </div>
@@ -140,7 +145,7 @@ export default function SignupPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2.5 border border-embee-slate/20 rounded-lg shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-2 focus:ring-embee-blue focus:border-embee-blue sm:text-sm transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -157,7 +162,7 @@ export default function SignupPage() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-embee-slate/20 rounded-md shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-embee-blue focus:border-embee-blue sm:text-sm"
+                className="mt-1 block w-full px-3 py-2.5 border border-embee-slate/20 rounded-lg shadow-sm placeholder-embee-slate/50 focus:outline-none focus:ring-2 focus:ring-embee-blue focus:border-embee-blue sm:text-sm transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -166,9 +171,19 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-embee-blue hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-embee-blue hover:bg-embee-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50 transition-colors touch-target"
           >
-            {loading ? 'Creating account...' : 'Create account'}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Creating account...
+              </span>
+            ) : (
+              'Create account'
+            )}
           </button>
         </form>
       </div>

@@ -12,9 +12,8 @@ interface LogoProps {
 /**
  * EMBEE NEXUS Logo Component
  *
- * INTERIM IMPLEMENTATION: Uses text wordmark fallback.
- * The final E/N monogram vector artwork is an external asset dependency.
- * When the approved SVG asset is supplied, update this component to use it.
+ * Uses text wordmark with brand typography.
+ * Brand assets available in CLAUDE_PREP/brand/assets/ for future SVG integration.
  */
 export function Logo({
   variant = 'full',
@@ -29,6 +28,12 @@ export function Logo({
     lg: 'text-3xl',
   };
 
+  const markSizes = {
+    sm: 'w-7 h-7 text-xs',
+    md: 'w-9 h-9 text-sm',
+    lg: 'w-12 h-12 text-lg',
+  };
+
   const themeClasses = {
     light: 'text-embee-charcoal',
     dark: 'text-white',
@@ -40,13 +45,12 @@ export function Logo({
   };
 
   if (variant === 'mark') {
-    // Compact E/N mark — text placeholder until monogram asset is available
     return (
-      <Link href={href} className={cn('flex items-center', className)}>
+      <Link href={href} className={cn('flex items-center', className)} aria-label="Embee Nexus home">
         <div
           className={cn(
             'flex items-center justify-center rounded-lg font-extrabold',
-            size === 'sm' ? 'w-7 h-7 text-xs' : size === 'lg' ? 'w-12 h-12 text-lg' : 'w-9 h-9 text-sm',
+            markSizes[size],
             theme === 'dark' ? 'bg-embee-blue text-white' : 'bg-embee-navy text-white'
           )}
         >
@@ -58,7 +62,7 @@ export function Logo({
 
   if (variant === 'wordmark') {
     return (
-      <Link href={href} className={cn('flex items-center gap-1', className)}>
+      <Link href={href} className={cn('flex items-center gap-1', className)} aria-label="Embee Nexus home">
         <span className={cn('font-extrabold tracking-tight', sizeClasses[size], themeClasses[theme])}>
           EMBEE
         </span>
@@ -71,11 +75,11 @@ export function Logo({
 
   // Full logo: mark + wordmark
   return (
-    <Link href={href} className={cn('flex items-center gap-3', className)}>
+    <Link href={href} className={cn('flex items-center gap-3', className)} aria-label="Embee Nexus home">
       <div
         className={cn(
           'flex items-center justify-center rounded-lg font-extrabold text-white',
-          size === 'sm' ? 'w-7 h-7 text-xs' : size === 'lg' ? 'w-12 h-12 text-lg' : 'w-9 h-9 text-sm',
+          markSizes[size],
           'bg-embee-blue'
         )}
       >

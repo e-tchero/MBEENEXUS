@@ -3,16 +3,47 @@ import { cn } from '@/lib/utils';
 interface LoadingStateProps {
   message?: string;
   className?: string;
+  variant?: 'spinner' | 'skeleton';
 }
 
-export function LoadingState({ message = 'Loading...', className }: LoadingStateProps) {
+export function LoadingState({ message = 'Loading...', className, variant = 'spinner' }: LoadingStateProps) {
+  if (variant === 'skeleton') {
+    return (
+      <div className={cn('space-y-4', className)} role="status" aria-label={message}>
+        <div className="sr-only">{message}</div>
+        <div className="bg-white rounded-lg p-4 space-y-3 shadow-embee-sm">
+          <div className="flex items-center gap-3">
+            <div className="skeleton h-10 w-10 rounded-full" />
+            <div className="space-y-2 flex-1">
+              <div className="skeleton h-4 w-1/3" />
+              <div className="skeleton h-3 w-1/2" />
+            </div>
+          </div>
+          <div className="skeleton h-3 w-full" />
+          <div className="skeleton h-3 w-2/3" />
+        </div>
+        <div className="bg-white rounded-lg p-4 space-y-3 shadow-embee-sm">
+          <div className="flex items-center gap-3">
+            <div className="skeleton h-10 w-10 rounded-full" />
+            <div className="space-y-2 flex-1">
+              <div className="skeleton h-4 w-1/3" />
+              <div className="skeleton h-3 w-1/2" />
+            </div>
+          </div>
+          <div className="skeleton h-3 w-full" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={cn('flex items-center justify-center py-12', className)}>
+    <div className={cn('flex items-center justify-center py-12', className)} role="status" aria-label={message}>
       <div className="flex items-center gap-3 text-embee-slate">
         <svg
           className="h-5 w-5 animate-spin"
           fill="none"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <circle
             className="opacity-25"

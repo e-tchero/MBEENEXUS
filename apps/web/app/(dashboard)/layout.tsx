@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppNav } from '@/components/shared/app-nav';
 import { ErrorBoundary } from '@/components/shared/error-boundary';
+import { CustomerBottomNav } from '@/components/navigation/customer-bottom-nav';
 
 const CUSTOMER_LINKS = [
   { label: 'Dashboard', href: '/dashboard' },
@@ -30,11 +31,12 @@ export default async function DashboardLayout({
         links={CUSTOMER_LINKS}
         user={{ name: user.email || 'Customer' }}
       />
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main id="main-content" className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-24 sm:pb-6">
         <ErrorBoundary context="customer-dashboard">
           {children}
         </ErrorBoundary>
       </main>
+      <CustomerBottomNav />
     </div>
   );
 }

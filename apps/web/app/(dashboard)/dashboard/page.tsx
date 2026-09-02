@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BookingForm } from '@/components/booking/booking-form';
 import { QuoteDisplay } from '@/components/booking/quote-display';
+import { SkeletonCard } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/shared/empty-state';
+import { useToast } from '@/components/ui/toast';
 import type { Address, DeliveryCategory } from '@repo/shared/types';
 
 interface QuoteData {
@@ -27,6 +30,7 @@ export default function DashboardPage() {
   const [selectedPickup] = useState('');
   const [selectedDestination] = useState('');
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function loadData() {
@@ -101,59 +105,75 @@ export default function DashboardPage() {
       }
     } catch (error) {
       logger.error('dashboard.order_create_failed', {}, error instanceof Error ? error : undefined);
+      toast({ variant: 'error', title: 'Failed to create order' });
     }
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-embee-slate">Loading...</div>
+      <div className="space-y-4">
+        <div className="h-8 w-48 skeleton rounded" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
       </div>
     );
   }
 
   if (addresses.length === 0) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-embee-charcoal mb-2">Welcome to Embee Nexus</h2>
-        <p className="text-embee-slate mb-4">
-          To get started, please add at least one address.
-        </p>
-        <Link
-          href="/addresses"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-embee-blue hover:bg-embee-blue/90"
-        >
-          Add Your First Address
-        </Link>
-      </div>
+      <EmptyState
+        title="Welcome to Embee Nexus"
+        description="To get started, please add at least one address."
+        action={
+          <Link
+            href="/addresses"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-embee-blue text-white text-sm font-medium rounded-lg hover:bg-embee-blue/90 transition-colors"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Add Your First Address
+          </Link>
+        }
+      />
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <div>
-        <BookingForm
-          addresses={addresses}
-          categories={categories}
-          onQuoteGenerated={handleQuoteGenerated}
-        />
-      </div>
-      <div>
-        {quote ? (
-          <QuoteDisplay
-            quote={quote}
+    <div>
+      <h1 className="text-2xl font-bold text-embee-charcoal mb-6">New Delivery</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <BookingForm
             addresses={addresses}
-            pickupAddressId={selectedPickup}
-            destinationAddressId={selectedDestination}
-            onConfirm={handleConfirmOrder}
+            categories={categories}
+            onQuoteGenerated={handleQuoteGenerated}
           />
-        ) : (
-          <div className="bg-embee-white rounded-lg p-8 text-center">
-            <p className="text-embee-slate">
-              Fill in the delivery details to get a quote.
-            </p>
-          </div>
-        )}
+        </div>
+        <div>
+          {quote ? (
+            <QuoteDisplay
+              quote={quote}
+              addresses={addresses}
+              pickupAddressId={selectedPickup}
+              destinationAddressId={selectedDestination}
+              onConfirm={handleConfirmOrder}
+            />
+          ) : (
+            <div className="bg-white rounded-lg shadow-embee-sm p-8 text-center">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-xl bg-embee-blue/10">
+                <svg className="h-6 w-6 text-embee-blue" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" />
+                </svg>
+              </div>
+              <p className="text-embee-slate text-sm">
+                Fill in the delivery details to get a quote.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

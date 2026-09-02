@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { cn } from '@/lib/utils';
 
 interface Offer {
   id: string;
@@ -76,43 +77,47 @@ export function OfferCard({ offer, onAccept, onReject }: OfferCardProps) {
   const progress = Math.min(100, (countdown / 300) * 100); // Assume 5 min default
 
   return (
-    <div className="bg-white shadow rounded-lg p-4 border-l-4 border-embee-blue">
-      {/* Countdown */}
+    <div className="bg-white shadow-embee-sm rounded-lg p-4 border-l-4 border-embee-blue animate-slide-up">
+      {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-embee-slate">New Offer</span>
-        <span className={`text-sm font-mono ${countdown < 60 ? 'text-red-600' : 'text-embee-charcoal'}`}>
+        <span className="text-xs font-semibold text-embee-blue uppercase tracking-wider">New Offer</span>
+        <span className={cn(
+          'text-lg font-mono font-bold tabular-nums',
+          countdown < 60 ? 'text-red-600' : countdown < 120 ? 'text-yellow-600' : 'text-embee-charcoal'
+        )}>
           {minutes}:{seconds.toString().padStart(2, '0')}
         </span>
       </div>
 
       {/* Progress bar */}
-      <div className="w-full bg-embee-slate/20 rounded-full h-1.5 mb-3">
+      <div className="w-full bg-embee-slate/10 rounded-full h-1.5 mb-4">
         <div
-          className={`h-1.5 rounded-full transition-all duration-1000 ${
-            countdown < 60 ? 'bg-red-500' : countdown < 120 ? 'bg-yellow-500' : 'bg-green-500'
-          }`}
+          className={cn(
+            'h-1.5 rounded-full transition-all duration-1000',
+            countdown < 60 ? 'bg-red-500' : countdown < 120 ? 'bg-yellow-500' : 'bg-embee-blue'
+          )}
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* Pickup/Delivery info */}
-      <div className="space-y-2 mb-3">
+      {/* Route */}
+      <div className="space-y-2 mb-4">
         {offer.pickup_address && (
-          <div className="flex items-start text-sm">
-            <span className="text-green-500 mr-2">●</span>
+          <div className="flex items-start gap-2 text-sm">
+            <span className="flex-shrink-0 w-2 h-2 rounded-full bg-green-500 mt-1.5" />
             <span className="text-embee-charcoal">{offer.pickup_address}</span>
           </div>
         )}
         {offer.delivery_address && (
-          <div className="flex items-start text-sm">
-            <span className="text-red-500 mr-2">●</span>
+          <div className="flex items-start gap-2 text-sm">
+            <span className="flex-shrink-0 w-2 h-2 rounded-full bg-red-500 mt-1.5" />
             <span className="text-embee-charcoal">{offer.delivery_address}</span>
           </div>
         )}
       </div>
 
       {/* Details */}
-      <div className="flex items-center justify-between text-sm text-embee-slate mb-3">
+      <div className="flex items-center gap-4 text-sm text-embee-slate mb-4">
         {offer.estimated_distance_km && (
           <span>{offer.estimated_distance_km.toFixed(1)} km</span>
         )}
@@ -120,7 +125,7 @@ export function OfferCard({ offer, onAccept, onReject }: OfferCardProps) {
           <span>~{offer.estimated_duration_minutes} min</span>
         )}
         {offer.base_fee && (
-          <span className="font-medium text-embee-charcoal">₦{offer.base_fee.toLocaleString()}</span>
+          <span className="font-semibold text-embee-charcoal">₦{offer.base_fee.toLocaleString()}</span>
         )}
       </div>
 
@@ -132,19 +137,25 @@ export function OfferCard({ offer, onAccept, onReject }: OfferCardProps) {
         <p className="text-xs text-red-600 mb-2">{error}</p>
       )}
 
-      {/* Actions */}
-      <div className="flex space-x-2">
+      {/* Actions — 44px touch targets */}
+      <div className="flex gap-3">
         <button
           onClick={handleAccept}
           disabled={actionLoading !== null}
-          className="flex-1 py-2 px-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+          className={cn(
+            'flex-1 py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 touch-target',
+            'bg-green-600 hover:bg-green-700 active:bg-green-800'
+          )}
         >
           {actionLoading === 'accept' ? 'Accepting...' : 'Accept'}
         </button>
         <button
           onClick={handleReject}
           disabled={actionLoading !== null}
-          className="flex-1 py-2 px-3 border border-embee-slate/30 text-sm font-medium rounded-md text-embee-charcoal bg-white hover:bg-embee-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50"
+          className={cn(
+            'flex-1 py-3 px-4 border border-embee-slate/20 text-sm font-semibold rounded-lg text-embee-charcoal bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-embee-blue disabled:opacity-50 touch-target',
+            'hover:bg-embee-white active:bg-embee-slate/10'
+          )}
         >
           {actionLoading === 'reject' ? 'Rejecting...' : 'Reject'}
         </button>

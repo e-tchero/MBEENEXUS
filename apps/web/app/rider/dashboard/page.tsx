@@ -27,15 +27,20 @@ export default async function RiderDashboardPage() {
   // If not approved, show pending verification
   if (riderProfile.verification_status !== 'approved') {
     return (
-      <div className="text-center py-12">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-md mx-auto">
-          <h2 className="text-lg font-medium text-yellow-800 mb-2">Account Pending Verification</h2>
-          <p className="text-sm text-yellow-700">
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="bg-status-warning/20 border border-status-warning/30 rounded-xl p-8 max-w-md w-full text-center">
+          <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-status-warning">
+            <svg className="h-6 w-6 text-status-warning-foreground" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-embee-charcoal mb-2">Account Pending Verification</h2>
+          <p className="text-sm text-embee-slate mb-4">
             Your account is currently under review. You will be able to access the dashboard once your verification is approved.
           </p>
           <Link
             href="/rider/onboarding"
-            className="mt-4 inline-block text-sm text-embee-blue hover:text-embee-blue/80"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-embee-blue text-white text-sm font-medium rounded-lg hover:bg-embee-blue/90 transition-colors"
           >
             View verification status
           </Link>

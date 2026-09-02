@@ -10,6 +10,7 @@ import { CancelOrderButton } from '@/components/order/cancel-order-button';
 import { RefundStatus } from '@/components/order/refund-status';
 import { ProofDisplay } from '@/components/order/proof-display';
 import { RatingForm } from '@/components/order/rating-form';
+import { useToast } from '@/components/ui/toast';
 
 interface OrderData {
   id: string;
@@ -79,6 +80,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
   } | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'reconnecting'>('connecting');
   const [refundInitiated, setRefundInitiated] = useState(false);
+  const { toast } = useToast();
 
   const isTracking = TRACKING_STATUSES.has(order.status);
   const isTerminal = TERMINAL_STATUSES.has(order.status);
@@ -125,7 +127,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
     };
   }, [order.id, isTracking, handleRiderLocation]);
 
-  // Poll for order status changes (for non-realtime updates)
+  // Poll for order status changes
   useEffect(() => {
     if (isTerminal) return;
 
@@ -136,15 +138,16 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
           const data = await res.json();
           if (data.order && data.order.status !== order.status) {
             setOrder((prev) => ({ ...prev, ...data.order }));
+            toast({ variant: 'info', title: `Order status updated: ${data.order.status.replace(/_/g, ' ')}` });
           }
         }
       } catch {
-        // Silently retry on next interval
+        // Silently retry
       }
-    }, 15000); // Poll every 15 seconds
+    }, 15000);
 
     return () => clearInterval(interval);
-  }, [order.id, order.status, isTerminal]);
+  }, [order.id, order.status, isTerminal, toast]);
 
   // Calculate ETA
   const etaMinutes = riderLocation && order.status === 'in_transit'
@@ -166,7 +169,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
   return (
     <div className="space-y-4">
       {/* Status Header */}
-      <div className="bg-white shadow rounded-lg p-4">
+      <div className="bg-white shadow-embee-sm rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-lg font-semibold text-embee-charcoal">{order.order_number}</h1>
           <StatusBadge status={order.status} />
@@ -174,13 +177,13 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
         <p className="text-xs text-embee-slate">Tracking: {order.tracking_code}</p>
 
         {connectionStatus === 'reconnecting' && (
-          <div className="mt-2 px-3 py-1.5 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
+          <div className="mt-2 px-3 py-1.5 bg-status-warning text-status-warning-foreground rounded text-xs">
             Reconnecting to live updates...
           </div>
         )}
       </div>
 
-      {/* Map */}
+      {/* Map — primary visual element */}
       {isTracking && (
         <TrackingMap
           pickupLat={order.pickup_latitude}
@@ -193,6 +196,19 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
           status={order.status}
           routeGeometry={order.route_geometry}
         />
+      )}
+
+      {/* ETA Banner */}
+      {etaMinutes && (
+        <div className="bg-embee-blue/10 rounded-lg p-3 flex items-center gap-3">
+          <svg className="h-5 w-5 text-embee-blue" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-embee-charcoal">Estimated arrival</p>
+            <p className="text-xs text-embee-slate">~{etaMinutes} minutes</p>
+          </div>
+        </div>
       )}
 
       {/* Rider Card */}
@@ -208,14 +224,12 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
 
       {/* Searching animation */}
       {order.status === 'searching_rider' && (
-        <div className="bg-white shadow rounded-lg p-6 text-center">
-          <div className="animate-pulse">
-            <div className="w-16 h-16 mx-auto mb-4 bg-embee-blue/10 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-embee-blue animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-            </div>
+        <div className="bg-white shadow-embee-sm rounded-lg p-6 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-embee-blue/10 rounded-full flex items-center justify-center">
+            <svg className="w-8 h-8 text-embee-blue animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
           </div>
           <p className="text-sm font-medium text-embee-charcoal">Finding a rider for you...</p>
           <p className="text-xs text-embee-slate mt-1">This usually takes less than a minute</p>
@@ -224,33 +238,33 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
 
       {/* Terminal states */}
       {order.status === 'cancelled' && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-sm font-medium text-red-800">This order has been cancelled</p>
+        <div className="bg-status-error/20 border border-status-error/30 rounded-lg p-4">
+          <p className="text-sm font-medium text-status-error-foreground">This order has been cancelled</p>
         </div>
       )}
       {order.status === 'failed' && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-sm font-medium text-red-800">Delivery failed</p>
-          <p className="text-xs text-red-600 mt-1">Please contact support for assistance</p>
+        <div className="bg-status-error/20 border border-status-error/30 rounded-lg p-4">
+          <p className="text-sm font-medium text-status-error-foreground">Delivery failed</p>
+          <p className="text-xs text-status-error-foreground/70 mt-1">Please contact support for assistance</p>
         </div>
       )}
       {order.status === 'delivered' && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-sm font-medium text-green-800">Package delivered!</p>
-          <p className="text-xs text-green-600 mt-1">
+        <div className="bg-status-success/20 border border-status-success/30 rounded-lg p-4">
+          <p className="text-sm font-medium text-status-success-foreground">Package delivered!</p>
+          <p className="text-xs text-status-success-foreground/70 mt-1">
             Delivered at {new Date(order.delivered_at!).toLocaleString('en-NG')}
           </p>
         </div>
       )}
       {order.status === 'completed' && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-sm font-medium text-green-800">Order completed</p>
+        <div className="bg-status-success/20 border border-status-success/30 rounded-lg p-4">
+          <p className="text-sm font-medium text-status-success-foreground">Order completed</p>
         </div>
       )}
 
-      {/* Phase 5C: Cancel button */}
+      {/* Cancel button */}
       {showCancelButton && (
-        <div className="bg-white shadow rounded-lg p-4">
+        <div className="bg-white shadow-embee-sm rounded-lg p-4">
           <CancelOrderButton
             orderId={order.id}
             onCancelled={handleCancelled}
@@ -258,7 +272,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
         </div>
       )}
 
-      {/* Phase 5C: Refund status */}
+      {/* Refund status */}
       {showRefundStatus && (
         <RefundStatus
           orderId={order.id}
@@ -266,7 +280,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
         />
       )}
 
-      {/* Phase 5C: Proof display */}
+      {/* Proof display */}
       {showProof && (
         <ProofDisplay
           orderId={order.id}
@@ -274,7 +288,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
         />
       )}
 
-      {/* Phase 5C: Rating form */}
+      {/* Rating form */}
       {showRating && (
         <RatingForm
           orderId={order.id}
@@ -283,7 +297,7 @@ export function OrderTracking({ order: initialOrder, events: initialEvents }: Or
       )}
 
       {/* Delivery Details */}
-      <div className="bg-white shadow rounded-lg p-4">
+      <div className="bg-white shadow-embee-sm rounded-lg p-4">
         <h3 className="text-sm font-semibold text-embee-charcoal mb-3">Delivery Details</h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
